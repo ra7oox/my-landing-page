@@ -13,8 +13,8 @@ const About = () => {
       const entry = entries[0];
       if (entry.isIntersecting && !counted) {
         setCounted(true);
-        animateValue('projects', 250);
-        animateValue('years', 15);
+        animateValue('projects', 70);
+        animateValue('years', 3);
         animateValue('satisfaction', 98);
       }
     }, { threshold: 0.1 });
@@ -38,50 +38,86 @@ const About = () => {
     updateCount();
   };
 
-  // Hover handlers to interact with Three.js central building
   const handleStatHover = (isHovered) => {
     if (window.highlightBuilding) {
-      window.highlightBuilding(isHovered ? 1 : -1); // Highlight Zenith Spire
+      window.highlightBuilding(isHovered ? 1 : -1);
     }
   };
+
+  const stats = [
+    {
+      value: counts.projects + '+',
+      label: t('aboutStatProjects'),
+      color: 'text-cyan-glow',
+      borderColor: 'border-cyan-glow/20 hover:border-cyan-glow/60',
+      glowColor: 'rgba(0,242,255,0.5)',
+    },
+    {
+      value: counts.years + '+',
+      label: t('aboutStatYears'),
+      color: 'text-amber-glow',
+      borderColor: 'border-amber-glow/20 hover:border-amber-glow/60',
+      glowColor: 'rgba(255,170,0,0.5)',
+    },
+    {
+      value: counts.satisfaction + '%',
+      label: t('aboutStatSatisfaction'),
+      color: 'text-violet-400',
+      borderColor: 'border-violet-400/20 hover:border-violet-400/60',
+      glowColor: 'rgba(168,85,247,0.5)',
+    },
+  ];
 
   return (
     <section 
       id="about" 
-      className="relative min-h-screen py-32 flex items-center justify-center overflow-hidden bg-transparent"
+      className="relative min-h-screen py-24 md:py-36 lg:py-44 flex items-center justify-center overflow-hidden bg-transparent"
     >
-      {/* Dark overlay to ensure text readability */}
-      <div className={`absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]`} />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
       <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[#070a12]/95 via-[#070a12]/50 to-transparent`} />
       
       <div className="container relative z-20 px-6 mx-auto">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
           
-          {/* Glassmorphic Panel on the Left (Futuristic B2B style) */}
           <motion.div 
             initial={{ opacity: 0, x: lang === 'ar' ? 50 : -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-navy-800/75 backdrop-blur-md border border-cyan-glow/30 p-8 md:p-12 rounded-xl shadow-[0_0_50px_rgba(0,242,255,0.1),inset_0_0_20px_rgba(0,242,255,0.03)] max-w-xl"
+            className="relative"
           >
-            <h2 
-              className="font-sans font-bold text-4xl md:text-5xl text-cyan-glow drop-shadow-[0_0_15px_rgba(0,242,255,0.5)] tracking-widest uppercase"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-glow/20 via-transparent to-amber-glow/20 rounded-2xl blur-xl opacity-50" />
+            <div 
+              className="relative bg-navy-800/80 backdrop-blur-md border border-cyan-glow/20 rounded-2xl shadow-[0_0_60px_rgba(0,242,255,0.08),inset_0_0_30px_rgba(0,242,255,0.02)] max-w-xl"
+              style={{ padding: '2.5rem' }}
             >
-              {t('aboutTitle')}
-            </h2>
-            <div className={`h-[2px] w-20 bg-cyan-glow mt-4 mb-6 shadow-[0_0_10px_rgba(0,242,255,0.8)] ${lang === 'ar' ? 'mr-0 ml-auto' : 'ml-0'}`} />
-            
-            <p className="text-white font-sans text-lg md:text-xl leading-relaxed font-semibold tracking-wide">
-              {t('aboutTagline')}
-            </p>
-            <p className="text-gray-400 font-sans text-sm md:text-base leading-relaxed mt-4">
-              {t('aboutDesc')}
-            </p>
+              <span className="text-cyan-glow text-[10px] uppercase tracking-[0.3em] font-mono font-bold block mb-4">
+                {t('aboutTitle')}
+              </span>
+              <h2 
+                className="font-bold text-3xl md:text-4xl text-white tracking-wide uppercase leading-tight"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                <span className="bg-gradient-to-r from-cyan-glow to-violet-400 bg-clip-text text-transparent">
+                  {t('aboutTagline')}
+                </span>
+              </h2>
+              <p className="text-gray-400 font-sans text-sm md:text-base leading-relaxed mt-6 font-light">
+                {t('aboutDesc')}
+              </p>
+              <div className="mt-8 flex gap-4 items-center">
+                <div className="flex -space-x-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-navy-900 bg-gradient-to-br from-cyan-glow/30 to-violet-500/30" />
+                  ))}
+                </div>
+                <span className="text-[10px] font-mono text-gray-500 tracking-wider uppercase">
+                  {lang === 'ar' ? 'فريق موزع عالمياً' : 'Global distributed team'}
+                </span>
+              </div>
+            </div>
           </motion.div>
           
-          {/* Stats Badges, rendered as sleek glowing tech indicators */}
           <motion.div 
             initial="hidden"
             whileInView="visible"
@@ -90,62 +126,36 @@ const About = () => {
               hidden: {},
               visible: { transition: { staggerChildren: 0.15 } }
             }}
-            className={`flex flex-col sm:flex-row lg:flex-col gap-6 justify-center ${lang === 'ar' ? 'lg:items-start' : 'lg:items-end'} w-full`} 
+            className="flex flex-col gap-5 w-full" 
             ref={statsRef}
           >
-            {/* Stat Item 1 */}
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-              }}
-              onMouseEnter={() => handleStatHover(true)}
-              onMouseLeave={() => handleStatHover(false)}
-              className="stat-item bg-navy-800/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/60 transition-all duration-300 cursor-none"
-            >
-              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,242,255,0.5)] font-display">
-                {counts.projects}+
-              </div>
-              <div className="stat-label text-[10px] uppercase tracking-widest text-gray-400 mt-2 font-mono">
-                {t('aboutStatProjects')}
-              </div>
-            </motion.div>
-            
-            {/* Stat Item 2 */}
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-              }}
-              onMouseEnter={() => handleStatHover(true)}
-              onMouseLeave={() => handleStatHover(false)}
-              className="stat-item bg-navy-800/75 backdrop-blur-md border border-amber-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-amber-glow/60 transition-all duration-300 cursor-none"
-            >
-              <div className="stat-number text-amber-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(255,170,0,0.5)] font-display">
-                {counts.years}+
-              </div>
-              <div className="stat-label text-[10px] uppercase tracking-widest text-gray-400 mt-2 font-mono">
-                {t('aboutStatYears')}
-              </div>
-            </motion.div>
-            
-            {/* Stat Item 3 */}
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-              }}
-              onMouseEnter={() => handleStatHover(true)}
-              onMouseLeave={() => handleStatHover(false)}
-              className="stat-item bg-navy-800/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/60 transition-all duration-300 cursor-none"
-            >
-              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,242,255,0.5)] font-display">
-                {counts.satisfaction}%
-              </div>
-              <div className="stat-label text-[10px] uppercase tracking-widest text-gray-400 mt-2 font-mono">
-                {t('aboutStatSatisfaction')}
-              </div>
-            </motion.div>
+            {stats.map((stat, i) => (
+              <motion.div 
+                key={i}
+                variants={{
+                  hidden: { opacity: 0, x: lang === 'ar' ? -30 : 30 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+                }}
+                onMouseEnter={() => handleStatHover(true)}
+                onMouseLeave={() => handleStatHover(false)}
+                className={`group bg-navy-800/70 backdrop-blur-md border ${stat.borderColor} rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-300 cursor-none hover:shadow-[0_0_40px_rgba(0,242,255,0.08)]`}
+                style={{ padding: '1.5rem' }}
+              >
+                <div className="flex flex-col">
+                  <div className={`${stat.color} text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_${stat.glowColor}] font-display`}>
+                    {stat.value}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1 font-mono">
+                    {stat.label}
+                  </div>
+                </div>
+                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all duration-300 ${stat.borderColor}`}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={stat.color}>
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
           
         </div>

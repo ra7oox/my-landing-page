@@ -7,52 +7,81 @@ const Services = () => {
 
   const services = [
     { 
-      idx: 0, // Left building (Apex Hub)
+      idx: 1, // Zenith building
+      projectKey: 'zenith',
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" strokeDasharray="4 4" />
-          <circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.2" />
-          <line x1="12" y1="2" x2="12" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 18V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2Z"/>
+          <path d="M20 6v12a2 2 0 0 1-2 2"/> 
+          <rect x="8" y="10" width="4" height="4" rx="1"/>
         </svg>
       ), 
       titleKey: 'servicesEng', 
-      descKey: 'servicesEngDesc' 
+      descKey: 'servicesEngDesc',
+      accent: 'from-cyan-glow/20 to-transparent',
+      gridClass: 'lg:col-span-6 md:col-span-6 col-span-12',
+      languages: 'Next.js • Three.js • GSAP • React',
     },
     { 
-      idx: 1, // Center building (Zenith Spire)
+      idx: 1, // Zenith building
+      projectKey: 'zenith',
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z" fill="currentColor" fillOpacity="0.1" />
-          <circle cx="12" cy="12" r="3" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 2L11 13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
         </svg>
       ), 
       titleKey: 'servicesConst', 
-      descKey: 'servicesConstDesc' 
+      descKey: 'servicesConstDesc',
+      accent: 'from-amber-glow/20 to-transparent',
+      gridClass: 'lg:col-span-6 md:col-span-6 col-span-12',
+      languages: 'HTML • Tailwind • SEO • JavaScript',
     },
     { 
-      idx: 2, // Right building (Lumina Grid)
+      idx: 0, // Apex Hub building
+      projectKey: 'apex',
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2C12 2 15 7 15 12C15 17 12 22 12 22" />
-          <path d="M12 2C12 2 9 7 9 12C9 17 12 22 12 22" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
       ), 
       titleKey: 'servicesMgmt', 
-      descKey: 'servicesMgmtDesc' 
+      descKey: 'servicesMgmtDesc',
+      accent: 'from-violet-500/20 to-transparent',
+      gridClass: 'lg:col-span-4 md:col-span-6 col-span-12',
+      languages: 'React • Node.js • Express • PostgreSQL',
     },
     { 
-      idx: 3, // Full structural dome highlight (Lumina + Apex)
+      idx: 2, // Lumina Dome building
+      projectKey: 'lumina',
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polygon points="12,2 22,12 12,22 2,12" />
-          <line x1="12" y1="2" x2="12" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="3"/>
         </svg>
       ), 
       titleKey: 'servicesInnov', 
-      descKey: 'servicesInnovDesc' 
+      descKey: 'servicesInnovDesc',
+      accent: 'from-cyan-glow/20 via-violet-500/10 to-transparent',
+      gridClass: 'lg:col-span-4 md:col-span-6 col-span-12',
+      languages: 'React Native • Expo • iOS • Android',
+    },
+    { 
+      idx: 3, // Python / Data Flow
+      projectKey: 'python',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+      ), 
+      titleKey: 'servicesPython', 
+      descKey: 'servicesPythonDesc',
+      accent: 'from-emerald-500/20 to-transparent',
+      gridClass: 'lg:col-span-4 md:col-span-12 col-span-12',
+      languages: 'Python • BeautifulSoup • Selenium • APIs',
     },
   ];
 
@@ -62,79 +91,91 @@ const Services = () => {
     }
   };
 
+  const handleCardClick = (projectKey) => {
+    if (window.selectProject) {
+      window.selectProject(projectKey);
+    }
+  };
+
   return (
     <section 
       id="services" 
-      className="relative py-32 bg-transparent min-h-screen flex items-center overflow-hidden"
+      className="relative py-24 md:py-36 lg:py-44 bg-transparent min-h-screen flex items-center overflow-hidden"
     >
-      <div className={`absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]`} />
-      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[#070a12]/95 via-[#070a12]/50 to-transparent`} />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
+      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[#070a12]/95 via-[#070a12]/30 to-transparent`} />
       
-      <div className="container mx-auto px-6 relative z-20">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
-          
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.12 } }
-            }}
-            className="flex flex-col gap-3 max-w-md w-full"
+      <div className="container mx-auto px-6 relative z-20 max-w-[1400px]">
+        
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className={`mb-16 max-w-4xl ${lang === 'ar' ? 'text-right' : 'text-left'}`}
+        >
+          <span className="text-cyan-glow text-[10px] uppercase tracking-[0.3em] font-mono font-bold block mb-3">
+            {t('servicesTitle')}
+          </span>
+          <h2 
+            className="text-3xl md:text-4xl font-bold text-white tracking-wide uppercase"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            {/* Services Header */}
+            {lang === 'ar' ? 'الخدمات التي أقدمها' : 'What I Build'}
+          </h2>
+          <div className={`h-[2px] w-16 bg-cyan-glow mt-4 mb-6 ${lang === 'ar' ? 'mr-0 ml-auto' : 'ml-0'}`} />
+          <p className="text-gray-400 text-sm md:text-base leading-relaxed font-sans font-light">
+            {t('servicesSubtitle')}
+          </p>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-12 w-full" style={{ gap: '1.25rem' }}>
+          {services.map((svc, i) => (
             <motion.div 
-              variants={{
-                hidden: { opacity: 0, x: lang === 'ar' ? 50 : -50 },
-                visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
-              }}
-              className="bg-navy-800/80 backdrop-blur-md border border-cyan-glow/30 rounded-t-2xl p-6 shadow-[0_0_20px_rgba(0,242,255,0.1),inset_0_0_15px_rgba(0,242,255,0.03)]"
+              key={i} 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: i * 0.1, ease: "easeOut" }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              onMouseEnter={() => handleCardHover(svc.idx)}
+              onMouseLeave={() => handleCardHover(-1)}
+              onClick={() => handleCardClick(svc.projectKey)}
+              className={`group relative bg-[#0d1525]/70 backdrop-blur-md border border-white/5 flex items-start rounded-xl hover:bg-${svc.accent} duration-400 shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:border-cyan-glow/25 hover:shadow-[0_0_40px_rgba(0,242,255,0.1)] cursor-pointer ${svc.gridClass}`}
+              style={{ padding: '1.75rem', gap: '1.25rem' }}
             >
-              <h2 
-                className="font-sans font-bold text-3xl text-white tracking-widest uppercase"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                {t('servicesTitle')}
-              </h2>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `linear-gradient(135deg, ${svc.accent})` }} />
+              
+              <div className="relative z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl border border-cyan-glow/20 bg-[#070c14]/80 text-cyan-glow group-hover:scale-110 group-hover:border-cyan-glow/40 transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.05)]">
+                {svc.icon}
+              </div>
+              
+              <div className="relative z-10 flex flex-col gap-2 w-full">
+                <h4 className="font-sans font-bold text-white text-base tracking-wide group-hover:text-cyan-glow transition-colors duration-300 uppercase">
+                  {t(svc.titleKey)}
+                </h4>
+                <p className="font-sans text-gray-400 text-sm leading-relaxed font-light">
+                  {t(svc.descKey)}
+                </p>
+                <div className="mt-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span 
+                    className="text-[8px] font-mono text-cyan-glow/60 tracking-widest uppercase border border-cyan-glow/10 rounded"
+                    style={{ padding: '2px 8px' }}
+                  >
+                    {svc.languages}
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute top-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full text-cyan-glow">
+                  <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4"/>
+                </svg>
+              </div>
             </motion.div>
-
-            {/* Core Services Cards List */}
-            {services.map((svc, i) => (
-              <motion.div 
-                key={i} 
-                variants={{
-                  hidden: { opacity: 0, x: lang === 'ar' ? 50 : -50 },
-                  visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
-                }}
-                whileHover={{ x: lang === 'ar' ? -12 : 12, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                onMouseEnter={() => handleCardHover(svc.idx)}
-                onMouseLeave={() => handleCardHover(-1)}
-                className={`group relative bg-navy-800/65 backdrop-blur-md border border-cyan-glow/20 p-6 flex items-center gap-6 hover:bg-cyan-glow/10 duration-300 shadow-[0_0_20px_rgba(0,242,255,0.05),inset_0_0_15px_rgba(0,242,255,0.02)] hover:border-cyan-glow hover:shadow-[0_0_30px_rgba(0,242,255,0.25),inset_0_0_20px_rgba(0,242,255,0.12)] cursor-none ${i === services.length - 1 ? 'rounded-b-2xl' : ''}`}
-              >
-                {/* Icon Circle */}
-                <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full border border-cyan-glow/30 bg-navy-900/80 text-cyan-glow group-hover:scale-110 group-hover:border-cyan-glow transition-all duration-300">
-                  {svc.icon}
-                </div>
-
-                {/* Card Text Info */}
-                <div className="flex flex-col">
-                  <h4 className="font-sans font-bold text-white text-lg tracking-wide group-hover:text-cyan-glow transition-colors duration-300 uppercase">
-                    {t(svc.titleKey)}
-                  </h4>
-                  <p className="font-sans text-gray-400 text-sm mt-1 leading-tight">
-                    {t(svc.descKey)}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-          
-          {/* Spacer for Right-side 3D model representation */}
-          <div className="hidden lg:block animate-pulse pointer-events-none" />
-          
+          ))}
         </div>
+        
       </div>
     </section>
   );

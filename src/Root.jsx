@@ -4,7 +4,7 @@ import './index.css';
 const MyVideo = () => {
   return (
     <div style={{ flex: 1, backgroundColor: 'var(--bg)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 80, fontFamily: 'Barlow Condensed' }}>
-      ARCOVA - Remotion Video
+      R7x Dev - Remotion Video
     </div>
   );
 };

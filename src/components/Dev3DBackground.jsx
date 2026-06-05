@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+const interpolate = (start, end, amt) => start + (end - start) * amt;
+
 const Dev3DBackground = () => {
   const canvasRef = useRef(null);
   const mountRef = useRef({
@@ -238,10 +240,24 @@ const Dev3DBackground = () => {
       sCanvas.height = 64;
       const sCtx = sCanvas.getContext('2d');
 
+      // Safe rounded rectangle helper for canvas text sprites
+      const drawRoundRect = (ctx, x, y, width, height, radius) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      };
+
       // Glassmorphic background
       sCtx.fillStyle = 'rgba(11, 20, 36, 0.85)';
-      sCtx.beginPath();
-      sCtx.roundRect(4, 4, 248, 56, 12);
+      drawRoundRect(sCtx, 4, 4, 248, 56, 12);
       sCtx.fill();
 
       // Glowing border
@@ -270,8 +286,8 @@ const Dev3DBackground = () => {
 
     // Define 3 stats badges
     const statsList = [
-      { text: '+250 PROJECTS', color: '#00f2ff', radius: 68, speed: 0.006, height: 15 },
-      { text: '+15 YEARS', color: '#ffaa00', radius: 82, speed: -0.005, height: 35 },
+      { text: '+70 PROJECTS', color: '#00f2ff', radius: 68, speed: 0.006, height: 15 },
+      { text: '+3 YEARS', color: '#ffaa00', radius: 82, speed: -0.005, height: 35 },
       { text: '98% CLIENTS', color: '#00f2ff', radius: 68, speed: 0.004, height: -10 }
     ];
 
@@ -405,30 +421,62 @@ const Dev3DBackground = () => {
           pTarY = 10;
           pTarZ = isMobile ? 95 : 68;
           pLoxX = 0;
+        } else if (selection === 'python') {
+          pTarX = 0;
+          pTarY = 55;
+          pTarZ = isMobile ? 120 : 90;
+          pLoxX = 0;
         }
 
         targetX = interpolate(isMobile ? 0 : -35, pTarX, ease);
         targetY = interpolate(isMobile ? 25 : -10, pTarY, ease);
         targetZ = interpolate(isMobile ? 190 : 160, pTarZ, ease);
         lookX = interpolate(isMobile ? 0 : -18, pLoxX, ease);
-        lookY = interpolate(0, selection === 'apex' || selection === 'lumina' ? -5 : 5, ease);
+        lookY = interpolate(0, selection === 'apex' || selection === 'lumina' ? -5 : selection === 'python' ? 45 : 5, ease);
       } else {
-        // Contact (looking down cyber city)
+        // Contact (camera shifted left, looking right at the spire and dome)
         const t = Math.min(1, (scrollPercent - 0.85) / 0.15);
         const ease = t * t * (3 - 2 * t);
 
         const selection = mountRef.current.zoomTarget;
-        let prevTarX = 0;
-        let prevTarY = 5;
-        let prevTarZ = isMobile ? 130 : 90;
-        if (selection === 'apex') { prevTarX = -90; prevTarY = -5; prevTarZ = 55; }
-        else if (selection === 'lumina') { prevTarX = 90; prevTarY = -5; prevTarZ = 55; }
+        let prevTarX = isMobile ? 0 : -35;
+        let prevTarY = isMobile ? 25 : -10;
+        let prevTarZ = isMobile ? 190 : 160;
+        let prevLookX = isMobile ? 0 : -18;
+        let prevLookY = 0;
 
-        targetX = interpolate(prevTarX, 0, ease);
-        targetY = interpolate(prevTarY, isMobile ? 130 : 160, ease);
-        targetZ = interpolate(prevTarZ, isMobile ? 180 : 190, ease);
-        lookX = interpolate(selection === 'apex' ? -90 : selection === 'lumina' ? 90 : 0, 0, ease);
-        lookY = interpolate(5, -25, ease);
+        if (selection === 'apex') {
+          prevTarX = -90;
+          prevTarY = -5;
+          prevTarZ = isMobile ? 75 : 55;
+          prevLookX = -90;
+          prevLookY = -5;
+        } else if (selection === 'lumina') {
+          prevTarX = 90;
+          prevTarY = -5;
+          prevTarZ = isMobile ? 75 : 55;
+          prevLookX = 90;
+          prevLookY = -5;
+        } else if (selection === 'zenith') {
+          prevTarX = 0;
+          prevTarY = 10;
+          prevTarZ = isMobile ? 95 : 68;
+          prevLookX = 0;
+          prevLookY = 5;
+        } else if (selection === 'python') {
+          prevTarX = 0;
+          prevTarY = 55;
+          prevTarZ = isMobile ? 120 : 90;
+          prevLookX = 0;
+          prevLookY = 45;
+        }
+
+        // Shift camera left and look right to display models on the right side
+        targetX = interpolate(prevTarX, isMobile ? 0 : -45, ease);
+        targetY = interpolate(prevTarY, isMobile ? 25 : 35, ease);
+        targetZ = interpolate(prevTarZ, isMobile ? 190 : 175, ease);
+        lookX = interpolate(prevLookX, isMobile ? 0 : 25, ease);
+        lookY = interpolate(prevLookY, isMobile ? -5 : -15, ease);
       }
 
       // Smoothly slide camera base position
@@ -583,7 +631,7 @@ const Dev3DBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-0 bg-[#0c0d13]"
+      className="fixed inset-0 w-full h-full pointer-events-none z-[-1] bg-[#070a12]"
       style={{ touchAction: 'none' }}
     />
   );
