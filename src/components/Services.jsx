@@ -21,7 +21,7 @@ const Services = () => {
         viewport={{ once: true }}
         transition={{ duration: 2.0, ease: [0.16, 1, 0.3, 1] }}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/services-bg.png)' }}
+        style={{ backgroundImage: 'url(./services-bg.png)' }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-900/95 via-navy-800/60 to-transparent z-10" />
       

@@ -48,7 +48,7 @@ const About = () => {
         viewport={{ once: true }}
         transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/about-bg.png)' }}
+        style={{ backgroundImage: 'url(./about-bg.png)' }}
       />
       
       {/* Dark overlay to ensure text readability */}

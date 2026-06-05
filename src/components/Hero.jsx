@@ -28,7 +28,7 @@ const Hero = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/hero-bg.png)' }}
+        style={{ backgroundImage: 'url(./hero-bg.png)' }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-900/95 via-navy-800/40 to-transparent z-10" />
       
