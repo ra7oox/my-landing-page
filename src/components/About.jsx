@@ -85,14 +85,17 @@ const About = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="bg-navy-900/75 backdrop-blur-md border border-cyan-glow/30 p-8 md:p-12 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.15),inset_0_0_20px_rgba(0,212,255,0.05)] max-w-xl"
+            className="bg-navy-800/75 backdrop-blur-md border border-cyan-glow/30 p-8 md:p-12 rounded-2xl shadow-[0_0_50px_rgba(0,242,255,0.15),inset_0_0_20px_rgba(0,242,255,0.05)] max-w-xl"
           >
-            <h2 className="font-sans font-bold text-4xl md:text-5xl text-white tracking-wide uppercase">
+            <h2 className="font-sans font-bold text-4xl md:text-5xl text-cyan-glow drop-shadow-[0_0_15px_rgba(0,242,255,0.65)] tracking-widest uppercase">
               About Us
             </h2>
-            <div className="h-[2px] w-20 bg-gradient-to-r from-cyan-glow to-transparent mt-4 mb-6" />
-            <p className="text-gray-300 font-sans text-lg leading-relaxed">
-              We are building the future with innovation, precision, and trust. Our engineering excellence combines advanced 3D fabrication, high-fidelity project simulation, and robotic construction techniques to deliver landmarks of tomorrow.
+            <div className="h-[2px] w-20 bg-cyan-glow mt-4 mb-6 shadow-[0_0_10px_rgba(0,242,255,0.8)]" />
+            <p className="text-white font-sans text-xl leading-relaxed font-semibold tracking-wide">
+              We are building the future with innovation, precision, and trust.
+            </p>
+            <p className="text-gray-400 font-sans text-base leading-relaxed mt-4">
+              Our engineering excellence integrates automated 3D fabrication, real-time BIM simulation, and robotic construction workflows to build the landmarks of tomorrow.
             </p>
           </motion.div>
           
