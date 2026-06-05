@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto:wght@400;700;900&family=Barlow+Condensed:wght@400;700;800&family=Barlow:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;700&family=Syne:wght@700;800&display=swap');
 
 @import "tailwindcss";
 
@@ -14,7 +14,7 @@
   --color-amber-dim: rgba(255, 170, 0, 0.15);
   
   --font-sans: 'Inter', sans-serif;
-  --font-display: 'Roboto', sans-serif;
+  --font-display: 'Syne', 'Space Grotesk', sans-serif;
   
   --shadow-glow-cyan: 0 0 20px rgba(0, 242, 255, 0.3), inset 0 0 10px rgba(0, 242, 255, 0.1);
   --shadow-glow-cyan-hover: 0 0 40px rgba(0, 242, 255, 0.6), inset 0 0 20px rgba(0, 242, 255, 0.2);

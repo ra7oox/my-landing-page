@@ -1,1080 +1,590 @@
 import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
 const Dev3DBackground = () => {
   const canvasRef = useRef(null);
+  const mountRef = useRef({
+    highlightedBuilding: -1,
+    zoomTarget: 'default'
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+
+    // Detect prefers-reduced-motion OS preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
 
-    // Dimensions of the 3D Editor Window
-    const W_editor = 520;
-    const H_editor = 330;
-    const D_editor = 12; // thickness
+    // Scene & Camera setup
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x070a12, 0.0025);
 
-    // Dimensions of the Browser Preview Window
-    const W_browser = 380;
-    const H_browser = 290;
-    const D_browser = 10;
+    const camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+    // Initial camera position
+    camera.position.set(0, 15, 220);
 
-    // Code files content
-    const codeAppJsx = [
-      "import React from 'react';",
-      "import Navbar from './components/Navbar';",
-      "import Hero from './components/Hero';",
-      "import About from './components/About';",
-      "",
-      "function App() {",
-      "  return (",
-      "    <div className='app'>",
-      "      <Navbar />",
-      "      <Hero />",
-      "      <About />",
-      "    </div>",
-      "  );",
-      "}",
-      "export default App;"
-    ];
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    const codeIndexCss = [
-      "@import 'tailwindcss';",
-      "",
-      "@theme {",
-      "  --color-cyan-glow: #00f2ff;",
-      "  --color-amber-glow: #ffaa00;",
-      "}",
-      "",
-      "body {",
-      "  background: #070a12;",
-      "  font-family: 'Inter';",
-      "}"
-    ];
+    // Global Group
+    const cityGroup = new THREE.Group();
+    scene.add(cityGroup);
 
-    // Scroll tracking
-    let scrollY = window.scrollY;
-    const handleScroll = () => {
-      scrollY = window.scrollY;
+    // ----------------------------------------------------
+    // LIGHTS SYSTEM
+    // ----------------------------------------------------
+    const ambientLight = new THREE.AmbientLight(0x0d1626, 2.5);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0x00f2ff, 3.5);
+    dirLight1.position.set(200, 300, 150);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0xffaa00, 2);
+    dirLight2.position.set(-200, 100, -150);
+    scene.add(dirLight2);
+
+    const pointLight = new THREE.PointLight(0x00f2ff, 4, 150);
+    pointLight.position.set(0, 20, 30);
+    scene.add(pointLight);
+
+    // ----------------------------------------------------
+    // MATERIALS
+    // ----------------------------------------------------
+    const materials = {
+      cyanWire: new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.25 }),
+      cyanGlow: new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.1 }),
+      amberWire: new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true, transparent: true, opacity: 0.25 }),
+      amberNode: new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.8 }),
+      steel: new THREE.MeshPhongMaterial({ color: 0x1d2c42, specular: 0x00f2ff, shininess: 30, flatShading: true }),
+      glass: new THREE.MeshPhongMaterial({ color: 0x0b1e36, transparent: true, opacity: 0.35, shininess: 80 })
     };
-    window.addEventListener('scroll', handleScroll);
 
-    // Mouse tracking for 3D spring tilt
+    // ----------------------------------------------------
+    // 1. ZENITH SPIRE (Center, x = 0, y = 0, z = 0)
+    // ----------------------------------------------------
+    const zenithGroup = new THREE.Group();
+    zenithGroup.position.set(0, -35, 0);
+    cityGroup.add(zenithGroup);
+
+    const floorCount = 5;
+    const floorHeight = 22;
+    const floors = [];
+
+    for (let i = 0; i < floorCount; i++) {
+      const floorGroup = new THREE.Group();
+      floorGroup.position.y = i * floorHeight;
+      zenithGroup.add(floorGroup);
+
+      // Floor slab (Interplay of concrete/steel plates)
+      const slabW = 32 - i * 4;
+      const slabGeo = new THREE.BoxGeometry(slabW, 2, slabW);
+      const slabMesh = new THREE.Mesh(slabGeo, materials.glass);
+      floorGroup.add(slabMesh);
+
+      // Outer steel frame beam highlight
+      const borderGeo = new THREE.BoxGeometry(slabW + 0.5, 0.8, slabW + 0.5);
+      const borderMesh = new THREE.Mesh(borderGeo, materials.cyanWire);
+      floorGroup.add(borderMesh);
+
+      // Columns (Pillars connecting to floor above)
+      if (i < floorCount - 1) {
+        const pillarH = floorHeight;
+        const colOffset = slabW / 2 - 2;
+        const positions = [
+          [-colOffset, -colOffset],
+          [colOffset, -colOffset],
+          [colOffset, colOffset],
+          [-colOffset, colOffset]
+        ];
+
+        positions.forEach(([cx, cz]) => {
+          const colGeo = new THREE.CylinderGeometry(0.8, 0.8, pillarH, 4);
+          const colMesh = new THREE.Mesh(colGeo, materials.steel);
+          colMesh.position.set(cx, pillarH / 2, cz);
+          floorGroup.add(colMesh);
+
+          // Diagonal support wireframes
+          const braceGeo = new THREE.BoxGeometry(0.2, pillarH * 1.3, 0.2);
+          const braceMesh = new THREE.Mesh(braceGeo, materials.cyanWire);
+          braceMesh.position.set(cx, pillarH / 2, cz);
+          braceMesh.rotation.z = Math.PI / 4;
+          floorGroup.add(braceMesh);
+        });
+      }
+      floors.push(floorGroup);
+    }
+
+    // Spire needle tip
+    const needleGeo = new THREE.CylinderGeometry(0.1, 1.2, 35, 4);
+    const needleMesh = new THREE.Mesh(needleGeo, materials.steel);
+    needleMesh.position.y = (floorCount - 1) * floorHeight + 17.5;
+    zenithGroup.add(needleMesh);
+
+    // Scaffolding cage surrounding the building
+    const scaffoldingGeo = new THREE.BoxGeometry(36, 120, 36);
+    const scaffoldingMesh = new THREE.Mesh(scaffoldingGeo, materials.cyanWire);
+    scaffoldingMesh.position.y = 50;
+    zenithGroup.add(scaffoldingMesh);
+
+    // ----------------------------------------------------
+    // 2. APEX HUB (Left, x = -90, y = 0, z = 0)
+    // ----------------------------------------------------
+    const apexGroup = new THREE.Group();
+    apexGroup.position.set(-90, -20, 0);
+    cityGroup.add(apexGroup);
+
+    // Modular blocks stacked/offset
+    const block1 = new THREE.Mesh(new THREE.BoxGeometry(24, 24, 24), materials.glass);
+    block1.position.y = -10;
+    apexGroup.add(block1);
+
+    const block1Wire = new THREE.Mesh(new THREE.BoxGeometry(24.5, 24.5, 24.5), materials.cyanWire);
+    block1Wire.position.y = -10;
+    apexGroup.add(block1Wire);
+
+    const block2 = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), materials.glass);
+    block2.position.set(6, 10, 6);
+    block2.rotation.y = Math.PI / 6;
+    apexGroup.add(block2);
+
+    const block2Wire = new THREE.Mesh(new THREE.BoxGeometry(20.5, 20.5, 20.5), new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true }));
+    block2Wire.position.set(6, 10, 6);
+    block2Wire.rotation.y = Math.PI / 6;
+    apexGroup.add(block2Wire);
+
+    // Steel truss columns
+    const baseGeo = new THREE.CylinderGeometry(1.5, 1.5, 30, 4);
+    const baseMesh = new THREE.Mesh(baseGeo, materials.steel);
+    baseMesh.position.set(-8, -25, -8);
+    apexGroup.add(baseMesh);
+
+    // ----------------------------------------------------
+    // 3. LUMINA GRID (Right, x = 90, y = 0, z = 0)
+    // ----------------------------------------------------
+    const luminaGroup = new THREE.Group();
+    luminaGroup.position.set(90, -25, 0);
+    cityGroup.add(luminaGroup);
+
+    // Geodesic digital dome wireframe
+    const domeGeo = new THREE.IcosahedronGeometry(25, 2);
+    const domeMesh = new THREE.Mesh(domeGeo, materials.amberWire);
+    luminaGroup.add(domeMesh);
+
+    // Adding glowing amber node spheres at geodesic junctions
+    const posAttr = domeGeo.attributes.position;
+    for (let i = 0; i < posAttr.count; i++) {
+      if (i % 6 === 0) { // filter density
+        const node = new THREE.Mesh(new THREE.SphereGeometry(0.8, 6, 6), materials.amberNode);
+        node.position.set(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+        luminaGroup.add(node);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 4. FLOATING DATA PARTICLES (BIM Streams)
+    // ----------------------------------------------------
+    const particleCount = 180;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      particlePositions[i] = (Math.random() - 0.5) * 350; // X
+      particlePositions[i + 1] = (Math.random() - 0.5) * 250; // Y
+      particlePositions[i + 2] = (Math.random() - 0.5) * 200; // Z
+    }
+
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    
+    // Custom Canvas Texture for perfectly round particles
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 16;
+    pCanvas.height = 16;
+    const pCtx = pCanvas.getContext('2d');
+    pCtx.fillStyle = '#ffffff';
+    pCtx.beginPath();
+    pCtx.arc(8, 8, 6, 0, Math.PI * 2);
+    pCtx.fill();
+    const pTexture = new THREE.CanvasTexture(pCanvas);
+
+    const particleMat = new THREE.PointsMaterial({
+      size: 1.5,
+      map: pTexture,
+      transparent: true,
+      color: 0x00f2ff,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // ----------------------------------------------------
+    // 5. ORBITING STAT BADGES (Interactive 3D Infographics)
+    // ----------------------------------------------------
+    const createTextSprite = (text, glowColor) => {
+      const sCanvas = document.createElement('canvas');
+      sCanvas.width = 256;
+      sCanvas.height = 64;
+      const sCtx = sCanvas.getContext('2d');
+
+      // Glassmorphic background
+      sCtx.fillStyle = 'rgba(11, 20, 36, 0.85)';
+      sCtx.beginPath();
+      sCtx.roundRect(4, 4, 248, 56, 12);
+      sCtx.fill();
+
+      // Glowing border
+      sCtx.strokeStyle = glowColor;
+      sCtx.lineWidth = 2.5;
+      sCtx.stroke();
+
+      // Bold text formatting
+      sCtx.fillStyle = '#ffffff';
+      sCtx.font = 'bold 19px Courier, monospace';
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.shadowColor = glowColor;
+      sCtx.shadowBlur = 8;
+      sCtx.fillText(text, 128, 32);
+
+      const tex = new THREE.CanvasTexture(sCanvas);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(38, 9.5, 1);
+      return sprite;
+    };
+
+    const orbitGroup = new THREE.Group();
+    cityGroup.add(orbitGroup);
+
+    // Define 3 stats badges
+    const statsList = [
+      { text: '+250 PROJECTS', color: '#00f2ff', radius: 68, speed: 0.006, height: 15 },
+      { text: '+15 YEARS', color: '#ffaa00', radius: 82, speed: -0.005, height: 35 },
+      { text: '98% CLIENTS', color: '#00f2ff', radius: 68, speed: 0.004, height: -10 }
+    ];
+
+    const statsSprites = statsList.map((stat, idx) => {
+      const sprite = createTextSprite(stat.text, stat.color);
+      orbitGroup.add(sprite);
+      return {
+        sprite,
+        radius: stat.radius,
+        speed: stat.speed,
+        height: stat.height,
+        angle: (idx * Math.PI * 2) / 3
+      };
+    });
+
+    // ----------------------------------------------------
+    // SCROLL & MOUSE INTERACTION TRACKERS
+    // ----------------------------------------------------
+    let scrollPercent = 0;
     let targetMouseX = 0;
     let targetMouseY = 0;
     let currentMouseX = 0;
     let currentMouseY = 0;
 
-    const handleMouseMove = (e) => {
-      const widthHalf = window.innerWidth / 2;
-      const heightHalf = window.innerHeight / 2;
-      targetMouseX = (e.clientX - widthHalf) / 45; // camera rotation offset
-      targetMouseY = (e.clientY - heightHalf) / 45;
+    const handleScrollLocal = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight || 1;
+      scrollPercent = window.scrollY / maxScroll;
     };
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScrollLocal);
 
-    const handleResize = () => {
+    const handleMouseMoveLocal = (e) => {
+      targetMouseX = (e.clientX - window.innerWidth / 2) / 100;
+      targetMouseY = (e.clientY - window.innerHeight / 2) / 100;
+    };
+    window.addEventListener('mousemove', handleMouseMoveLocal);
+
+    // Resize handler
+    const handleResizeLocal = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResizeLocal);
 
-    // Dynamic animation metrics
-    let time = 0;
-    let charsTyped = 0;
-    let compileTimer = 0;
-    let laserBeams = [];
-
-    // Initialize 25 floating background nodes in World Space
-    const backgroundNodes = [];
-    const numNodes = 25;
-    const symbols = ['0', '1', '</>', '{', '}', 'App', 'npm', 'dev', 'CSS', 'JS'];
-    for (let i = 0; i < numNodes; i++) {
-      backgroundNodes.push({
-        x: (Math.random() - 0.5) * 1100,
-        y: (Math.random() - 0.5) * 800,
-        z: Math.random() * 500 - 300,
-        symbol: symbols[Math.floor(Math.random() * symbols.length)],
-        color: Math.random() > 0.4 ? 'rgba(0, 242, 255, 0.25)' : 'rgba(255, 170, 0, 0.22)',
-        speed: 0.15 + Math.random() * 0.35,
-        rotSpeed: 0.002 + Math.random() * 0.01
-      });
-    }
-
-    // Skyscraper 3D wireframe building points (inside Browser Preview)
-    const buildingVertices = [];
-    const buildingLines = [];
-    const floors = 6;
-    const baseW = 28;
-    const floorH = 20;
-
-    // Generate building vertices
-    for (let f = 0; f <= floors; f++) {
-      const y_val = H_browser / 2 - 40 - f * floorH; // base at bottom of window
-      const f_scale = 1 - (f / floors) * 0.28; // Taper at the top
-      const curW = baseW * f_scale;
-
-      // 4 corners of floor
-      buildingVertices.push({ x: -curW, y: y_val, z: -curW }); // 0
-      buildingVertices.push({ x: curW, y: y_val, z: -curW });  // 1
-      buildingVertices.push({ x: curW, y: y_val, z: curW });   // 2
-      buildingVertices.push({ x: -curW, y: y_val, z: curW });  // 3
-    }
-
-    // Generate building lines
-    for (let f = 0; f <= floors; f++) {
-      const offset = f * 4;
-      // Horizontal structural beams
-      buildingLines.push([offset + 0, offset + 1]);
-      buildingLines.push([offset + 1, offset + 2]);
-      buildingLines.push([offset + 2, offset + 3]);
-      buildingLines.push([offset + 3, offset + 0]);
-
-      // Base crosses
-      buildingLines.push([offset + 0, offset + 2]);
-
-      // Vertical pillars and diagonal wall braces
-      if (f < floors) {
-        const nextOffset = (f + 1) * 4;
-        buildingLines.push([offset + 0, nextOffset + 0]);
-        buildingLines.push([offset + 1, nextOffset + 1]);
-        buildingLines.push([offset + 2, nextOffset + 2]);
-        buildingLines.push([offset + 3, nextOffset + 3]);
-
-        // X brace details
-        buildingLines.push([offset + 0, nextOffset + 1]);
-        buildingLines.push([offset + 1, nextOffset + 2]);
-        buildingLines.push([offset + 2, nextOffset + 3]);
-        buildingLines.push([offset + 3, nextOffset + 0]);
-      }
-    }
-
-    // Helper functions for 3D mathematics
-    const rotateY = (pt, rad) => {
-      const cosY = Math.cos(rad);
-      const sinY = Math.sin(rad);
-      return {
-        x: pt.x * cosY + pt.z * sinY,
-        y: pt.y,
-        z: -pt.x * sinY + pt.z * cosY
-      };
+    // Expose global hooks to card overlays
+    window.highlightBuilding = (index) => {
+      mountRef.current.highlightedBuilding = index;
     };
 
-    const interpolate = (start, end, progress) => start + (end - start) * progress;
-
-    const tokenizeLine = (line) => {
-      const tokens = [];
-      const words = line.split(/(\s+|=|>|<|\(|\)|\{|\}|\[|\]|;|'|"|\/)/);
-      let inString = false;
-      let stringChar = null;
-      let currentString = "";
-
-      const keywords = ['import', 'from', 'const', 'let', 'function', 'return', 'export', 'default', 'class', 'extends'];
-      const components = ['Navbar', 'Hero', 'About', 'Services', 'Dev3DBackground', 'App'];
-      const cyanGlowKeywords = ['className', 'id', 'div', 'section', 'h1', 'p', 'button'];
-
-      for (let i = 0; i < words.length; i++) {
-        const w = words[i];
-        if (!w) continue;
-
-        if (inString) {
-          currentString += w;
-          if (w === stringChar) {
-            tokens.push({ text: currentString, color: '#a3be8c' }); // green for strings
-            inString = false;
-            currentString = "";
-          }
-          continue;
-        }
-
-        if (w === "'" || w === '"') {
-          inString = true;
-          stringChar = w;
-          currentString = w;
-          continue;
-        }
-
-        if (keywords.includes(w)) {
-          tokens.push({ text: w, color: '#ffaa00' }); // amber for keywords
-        } else if (components.includes(w)) {
-          tokens.push({ text: w, color: '#61afef' }); // blue for components
-        } else if (cyanGlowKeywords.includes(w)) {
-          tokens.push({ text: w, color: '#00f2ff' }); // cyan for html/tags
-        } else if (w === 'return') {
-          tokens.push({ text: w, color: '#c678dd' }); // purple
-        } else if (/^\d+$/.test(w)) {
-          tokens.push({ text: w, color: '#d19a66' }); // orange for numbers
-        } else {
-          const punc = ['=', '>', '<', '(', ')', '{', '}', '[', ']', ';'];
-          if (punc.includes(w)) {
-            tokens.push({ text: w, color: '#abb2bf' });
-          } else {
-            tokens.push({ text: w, color: '#ffffff' });
-          }
-        }
-      }
-
-      if (inString && currentString) {
-        tokens.push({ text: currentString, color: '#a3be8c' });
-      }
-
-      return tokens;
+    window.zoomToBuilding = (name) => {
+      mountRef.current.zoomTarget = name;
     };
 
-    const getTypedLines = (lines, charsLimit) => {
-      let count = 0;
-      const result = [];
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (count + line.length < charsLimit) {
-          result.push(line);
-          count += line.length + 1; // +1 for newline character
-        } else {
-          const remaining = charsLimit - count;
-          result.push(line.substring(0, remaining));
-          break;
-        }
-      }
-      return result;
-    };
+    // Camera base and lookAt positions
+    const camBasePos = new THREE.Vector3(0, 15, 220);
+    const camLookAt = new THREE.Vector3(0, 0, 0);
 
-    let animId;
+    let animationFrameId;
 
-    const animate = () => {
-      time++;
+    // ----------------------------------------------------
+    // ANIMATION TICKER LOOP
+    // ----------------------------------------------------
+    const tick = () => {
+      const isMobile = window.innerWidth < 768;
 
-      // Clear with obsidian base
-      ctx.fillStyle = '#070a12';
-      ctx.fillRect(0, 0, width, height);
-
-      // Smooth mouse spring interpolation
+      // Mouse spring interpolation
       currentMouseX += (targetMouseX - currentMouseX) * 0.08;
       currentMouseY += (targetMouseY - currentMouseY) * 0.08;
 
-      // Scroll interpolation calculator
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight || 1;
-      const scrollPercent = scrollY / maxScroll;
+      // Calculate camera targets based on active scroll section
+      let targetX = 0;
+      let targetY = 15;
+      let targetZ = 220;
+      let lookX = 0;
+      let lookY = 0;
+      let lookZ = 0;
 
-      // Typewriter incrementation inside Hero
-      if (scrollPercent < 0.20 && charsTyped < 250) {
-        charsTyped += 0.55;
-      }
-
-      // Compile logs controller inside Services section
-      if (scrollPercent >= 0.40 && scrollPercent <= 0.70) {
-        compileTimer += 1;
-      } else {
-        compileTimer = 0; // reset
-      }
-
-      // Set up camera coordinates
-      const camera = {
-        x: 0,
-        y: 0,
-        z: 460, // distance
-        rotX: -currentMouseY * 0.015, // tilt
-        rotY: -currentMouseX * 0.015,
-        fov: 380
-      };
-
-      // 3D coordinate projection matrix
-      const projectPoint = (lx, ly, lz, pos, rot) => {
-        let x = lx;
-        let y = ly;
-        let z = lz;
-
-        // Apply local rotation around Y axis
-        if (rot.y !== 0) {
-          const cosY = Math.cos(rot.y);
-          const sinY = Math.sin(rot.y);
-          const x1 = x * cosY + z * sinY;
-          const z1 = -x * sinY + z * cosY;
-          x = x1;
-          z = z1;
-        }
-        // Apply local rotation around X axis
-        if (rot.x !== 0) {
-          const cosX = Math.cos(rot.x);
-          const sinX = Math.sin(rot.x);
-          const y1 = y * cosX - z * sinX;
-          const z1 = y * sinX + z * cosX;
-          y = y1;
-          z = z1;
-        }
-        // Apply local rotation around Z axis
-        if (rot.z !== 0) {
-          const cosZ = Math.cos(rot.z);
-          const sinZ = Math.sin(rot.z);
-          const x1 = x * cosZ - y * sinZ;
-          const y1 = x * sinZ + y * cosZ;
-          x = x1;
-          y = y1;
-        }
-
-        // Translate to world space coordinates
-        const wx = x + pos.x;
-        const wy = y + pos.y;
-        const wz = z + pos.z;
-
-        // Camera translation (offset from camera eye)
-        let cx = wx - camera.x;
-        let cy = wy - camera.y;
-        let cz = wz - camera.z;
-
-        // Rotate point around camera Y axis (horizontal pan)
-        if (camera.rotY !== 0) {
-          const cosY = Math.cos(camera.rotY);
-          const sinY = Math.sin(camera.rotY);
-          const rx = cx * cosY - cz * sinY;
-          const rz = cx * sinY + cz * cosY;
-          cx = rx;
-          cz = rz;
-        }
-        // Rotate point around camera X axis (vertical tilt)
-        if (camera.rotX !== 0) {
-          const cosX = Math.cos(camera.rotX);
-          const sinX = Math.sin(camera.rotX);
-          const ry = cy * cosX - cz * sinX;
-          const rz = cy * sinX + cz * cosX;
-          cy = ry;
-          cz = rz;
-        }
-
-        // Camera looks at negative Z axis. Distance is -cz.
-        const distance = -cz;
-        if (distance <= 40) return null; // clipped/behind camera
-
-        const scale = camera.fov / distance;
-        const screenX = cx * scale + width / 2;
-        const screenY = cy * scale + height / 2;
-
-        return { x: screenX, y: screenY, scale, depth: distance };
-      };
-
-      // Project World Space coordinates to Screen Space
-      const projectWorld = (wx, wy, wz) => {
-        let cx = wx - camera.x;
-        let cy = wy - camera.y;
-        let cz = wz - camera.z;
-
-        if (camera.rotY !== 0) {
-          const cosY = Math.cos(camera.rotY);
-          const sinY = Math.sin(camera.rotY);
-          const rx = cx * cosY - cz * sinY;
-          const rz = cx * sinY + cz * cosY;
-          cx = rx;
-          cz = rz;
-        }
-        if (camera.rotX !== 0) {
-          const cosX = Math.cos(camera.rotX);
-          const sinX = Math.sin(camera.rotX);
-          const ry = cy * cosX - cz * sinX;
-          const rz = cy * sinX + cz * cosX;
-          cy = ry;
-          cz = rz;
-        }
-
-        const distance = -cz;
-        if (distance <= 40) return null;
-
-        const scale = camera.fov / distance;
-        return {
-          x: cx * scale + width / 2,
-          y: cy * scale + height / 2,
-          scale,
-          depth: distance
-        };
-      };
-
-      // Get interpolated window coordinates based on active scroll section
-      const getEditorState = () => {
-        const isMobile = width < 768;
-
-        // Configuration sets: pos (x, y, z), rot (rx, ry, rz), browser split percentage
-        const config = [
-          { // 0: Hero (Centered, typing)
-            pos: { x: 0, y: 15, z: 0 },
-            rot: { x: 0.08, y: -0.20, z: -0.01 },
-            split: 0
-          },
-          { // 1: About (Shifted right, side rotation bezel visible)
-            pos: { x: width * 0.17, y: -25, z: -80 },
-            rot: { x: 0.12, y: -0.46, z: 0.04 },
-            split: 0
-          },
-          { // 2: Services (Shifted left, console typing terminal compiling)
-            pos: { x: -width * 0.17, y: 30, z: -70 },
-            rot: { x: -0.06, y: 0.40, z: -0.04 },
-            split: 0
-          },
-          { // 3: Projects (Double panel layout split)
-            pos: { x: -width * 0.19, y: -5, z: -40 },
-            rot: { x: 0.05, y: 0.20, z: 0.02 },
-            split: 1.0
-          },
-          { // 4: Contact (Cyber console bottom-stage zoom-out)
-            pos: { x: 0, y: -130, z: 220 },
-            rot: { x: 0.65, y: -0.28, z: 0.12 },
-            split: 0
-          }
-        ];
-
-        // Adaptive styling metrics for mobile viewports
-        if (isMobile) {
-          config[0].pos = { x: 0, y: 70, z: 80 };
-          config[0].rot = { x: 0.04, y: -0.06, z: 0.0 };
-
-          config[1].pos = { x: 0, y: 110, z: 120 };
-          config[1].rot = { x: 0.06, y: -0.10, z: 0.01 };
-
-          config[2].pos = { x: 0, y: 120, z: 120 };
-          config[2].rot = { x: -0.04, y: 0.10, z: -0.01 };
-
-          config[3].pos = { x: 0, y: 140, z: 100 };
-          config[3].rot = { x: 0.03, y: 0.05, z: 0.0 };
-          config[3].split = 0.5; // half-width overlay split on mobile
-
-          config[4].pos = { x: 0, y: 100, z: 190 };
-          config[4].rot = { x: 0.30, y: -0.08, z: 0.03 };
-        }
-
-        let idx = 0;
-        let t = 0;
-
-        if (scrollPercent <= 0.15) {
-          return config[0];
-        } else if (scrollPercent <= 0.40) {
-          idx = 0;
-          t = (scrollPercent - 0.15) / 0.25;
-        } else if (scrollPercent <= 0.65) {
-          idx = 1;
-          t = (scrollPercent - 0.40) / 0.25;
-        } else if (scrollPercent <= 0.85) {
-          idx = 2;
-          t = (scrollPercent - 0.65) / 0.20;
-        } else {
-          idx = 3;
-          t = Math.min(1, (scrollPercent - 0.85) / 0.15);
-        }
-
-        const k1 = config[idx];
-        const k2 = config[idx + 1];
-
-        // Smooth cubic interpolation curves
+      // Define camera configurations
+      if (scrollPercent <= 0.15) {
+        // Hero
+        targetX = 0;
+        targetY = 15;
+        targetZ = isMobile ? 245 : 200;
+        lookX = 0;
+        lookY = -10;
+        lookZ = 0;
+      } else if (scrollPercent <= 0.40) {
+        // About (metrics orbit visible)
+        const t = (scrollPercent - 0.15) / 0.25;
+        const ease = t * t * (3 - 2 * t);
+        targetX = interpolate(0, isMobile ? 0 : 35, ease);
+        targetY = interpolate(15, isMobile ? 25 : 25, ease);
+        targetZ = interpolate(isMobile ? 245 : 200, isMobile ? 180 : 155, ease);
+        lookX = interpolate(0, isMobile ? 0 : 10, ease);
+        lookY = interpolate(-10, -5, ease);
+      } else if (scrollPercent <= 0.65) {
+        // Services (highlights active)
+        const t = (scrollPercent - 0.40) / 0.25;
+        const ease = t * t * (3 - 2 * t);
+        targetX = interpolate(isMobile ? 0 : 35, isMobile ? 0 : -35, ease);
+        targetY = interpolate(25, isMobile ? 25 : -10, ease);
+        targetZ = interpolate(isMobile ? 180 : 155, isMobile ? 190 : 160, ease);
+        lookX = interpolate(isMobile ? 0 : 10, isMobile ? 0 : -18, ease);
+        lookY = interpolate(-5, 0, ease);
+      } else if (scrollPercent <= 0.85) {
+        // Projects (zoom-interactive triggers)
+        const t = (scrollPercent - 0.65) / 0.20;
         const ease = t * t * (3 - 2 * t);
 
-        return {
-          pos: {
-            x: interpolate(k1.pos.x, k2.pos.x, ease),
-            y: interpolate(k1.pos.y, k2.pos.y, ease),
-            z: interpolate(k1.pos.z, k2.pos.z, ease)
-          },
-          rot: {
-            x: interpolate(k1.rot.x, k2.rot.x, ease),
-            y: interpolate(k1.rot.y, k2.rot.y, ease),
-            z: interpolate(k1.rot.z, k2.rot.z, ease)
-          },
-          split: interpolate(k1.split, k2.split, ease)
-        };
-      };
+        // Zoom focus checks based on user selection clicks
+        const selection = mountRef.current.zoomTarget;
+        let pTarX = 0;
+        let pTarY = 5;
+        let pTarZ = isMobile ? 130 : 90;
+        let pLoxX = 0;
 
-      const editorState = getEditorState();
+        if (selection === 'apex') {
+          pTarX = -90;
+          pTarY = -5;
+          pTarZ = isMobile ? 75 : 55;
+          pLoxX = -90;
+        } else if (selection === 'lumina') {
+          pTarX = 90;
+          pTarY = -5;
+          pTarZ = isMobile ? 75 : 55;
+          pLoxX = 90;
+        } else if (selection === 'zenith') {
+          pTarX = 0;
+          pTarY = 10;
+          pTarZ = isMobile ? 95 : 68;
+          pLoxX = 0;
+        }
 
-      // Project drawing configurations for elements
-      const project = (lx, ly, lz) => {
-        return projectPoint(lx, ly, lz, editorState.pos, editorState.rot);
-      };
+        targetX = interpolate(isMobile ? 0 : -35, pTarX, ease);
+        targetY = interpolate(isMobile ? 25 : -10, pTarY, ease);
+        targetZ = interpolate(isMobile ? 190 : 160, pTarZ, ease);
+        lookX = interpolate(isMobile ? 0 : -18, pLoxX, ease);
+        lookY = interpolate(0, selection === 'apex' || selection === 'lumina' ? -5 : 5, ease);
+      } else {
+        // Contact (looking down cyber city)
+        const t = Math.min(1, (scrollPercent - 0.85) / 0.15);
+        const ease = t * t * (3 - 2 * t);
+
+        const selection = mountRef.current.zoomTarget;
+        let prevTarX = 0;
+        let prevTarY = 5;
+        let prevTarZ = isMobile ? 130 : 90;
+        if (selection === 'apex') { prevTarX = -90; prevTarY = -5; prevTarZ = 55; }
+        else if (selection === 'lumina') { prevTarX = 90; prevTarY = -5; prevTarZ = 55; }
+
+        targetX = interpolate(prevTarX, 0, ease);
+        targetY = interpolate(prevTarY, isMobile ? 130 : 160, ease);
+        targetZ = interpolate(prevTarZ, isMobile ? 180 : 190, ease);
+        lookX = interpolate(selection === 'apex' ? -90 : selection === 'lumina' ? 90 : 0, 0, ease);
+        lookY = interpolate(5, -25, ease);
+      }
+
+      // Smoothly slide camera base position
+      camBasePos.x += (targetX - camBasePos.x) * 0.05;
+      camBasePos.y += (targetY - camBasePos.y) * 0.05;
+      camBasePos.z += (targetZ - camBasePos.z) * 0.05;
+
+      camLookAt.x += (lookX - camLookAt.x) * 0.05;
+      camLookAt.y += (lookY - camLookAt.y) * 0.05;
+      camLookAt.z += (lookZ - camLookAt.z) * 0.05;
+
+      // Apply coordinates + mouse tilt parallax offsets
+      camera.position.set(
+        camBasePos.x + currentMouseX * (isMobile ? 12 : 24),
+        camBasePos.y - currentMouseY * (isMobile ? 12 : 24),
+        camBasePos.z
+      );
+      camera.lookAt(camLookAt.x, camLookAt.y, camLookAt.z);
 
       // ----------------------------------------------------
-      // DRAW 1. FLOATING WORLD BACKGROUND NODES
+      // CONSTRUCT TIME LAPSE ANIMATIONS (floor-by-floor scaling)
       // ----------------------------------------------------
-      backgroundNodes.forEach(node => {
-        node.y -= node.speed;
-        if (node.y < -400) node.y = 400; // Loop vertically
-        node.z += Math.sin(time * node.rotSpeed) * 0.2;
+      // Floor time lapse scales up between scroll 15% and 70%
+      const buildProgress = Math.min(1, Math.max(0, (scrollPercent - 0.15) / 0.50));
 
-        const p = projectWorld(node.x, node.y, node.z);
-        if (!p || p.scale < 0.1) return;
+      floors.forEach((floor, idx) => {
+        // Floor scaling interval
+        const start = idx / floorCount;
+        const end = (idx + 1) / floorCount;
+        let floorT = (buildProgress - start) / (end - start);
+        floorT = Math.min(1, Math.max(0, floorT));
 
-        // Draw symbol
-        ctx.fillStyle = node.color;
-        ctx.font = `${Math.floor(10 * p.scale)}px monospace`;
-        ctx.fillText(node.symbol, p.x, p.y);
+        if (floorT <= 0) {
+          floor.visible = false;
+        } else {
+          floor.visible = true;
+          // Scale height and slide down into place
+          floor.scale.y = floorT;
+          floor.position.y = idx * floorHeight + (1 - floorT) * 18;
+        }
+      });
 
-        // Connections to other nearby nodes
-        backgroundNodes.forEach(n2 => {
-          if (n2 === node) return;
-          const dx = n2.x - node.x;
-          const dy = n2.y - node.y;
-          const dz = n2.z - node.z;
-          const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-          if (dist < 150) {
-            const p2 = projectWorld(n2.x, n2.y, n2.z);
-            if (p2) {
-              const alpha = (1 - dist / 150) * 0.05 * p.scale;
-              ctx.strokeStyle = `rgba(0, 242, 255, ${alpha})`;
-              ctx.lineWidth = 0.5 * p.scale;
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.stroke();
-            }
-          }
-        });
+      // Slowly rotate city
+      cityGroup.rotation.y = scrollPercent * Math.PI * 0.5;
+
+      // Orbiting metrics loop
+      statsSprites.forEach(item => {
+        item.angle += item.speed;
+        item.sprite.position.set(
+          Math.cos(item.angle) * item.radius,
+          item.height,
+          Math.sin(item.angle) * item.radius
+        );
       });
 
       // ----------------------------------------------------
-      // DRAW PANEL REUSABLE HELPER
+      // HOVER HIGHLIGHT SYSTEM (Glow structures on hover)
       // ----------------------------------------------------
-      const drawPanel = (x1, y1, x2, y2, z, fillColor, borderColor, projFunc = project) => {
-        const c0 = projFunc(x1, y1, z);
-        const c1 = projFunc(x2, y1, z);
-        const c2 = projFunc(x2, y2, z);
-        const c3 = projFunc(x1, y2, z);
-        if (!c0 || !c1 || !c2 || !c3) return;
+      const highlighted = mountRef.current.highlightedBuilding;
+      
+      // Mute materials base colors
+      materials.cyanWire.color.setHex(highlighted === 1 ? 0x00f2ff : 0x0058aa);
+      materials.cyanWire.opacity = highlighted === 1 ? 0.5 : 0.25;
 
-        ctx.fillStyle = fillColor;
-        ctx.beginPath();
-        ctx.moveTo(c0.x, c0.y);
-        ctx.lineTo(c1.x, c1.y);
-        ctx.lineTo(c2.x, c2.y);
-        ctx.lineTo(c3.x, c3.y);
-        ctx.closePath();
-        ctx.fill();
+      materials.cyanGlow.color.setHex(highlighted === 1 ? 0x00f2ff : 0x0033aa);
+      materials.cyanGlow.opacity = highlighted === 1 ? 0.25 : 0.08;
 
-        if (borderColor) {
-          ctx.strokeStyle = borderColor;
-          ctx.lineWidth = 0.8 * c0.scale;
-          ctx.beginPath();
-          ctx.moveTo(c0.x, c0.y);
-          ctx.lineTo(c1.x, c1.y);
-          ctx.lineTo(c2.x, c2.y);
-          ctx.lineTo(c3.x, c3.y);
-          ctx.closePath();
-          ctx.stroke();
-        }
-      };
+      materials.amberWire.color.setHex(highlighted === 0 ? 0x00f2ff : highlighted === 3 ? 0x00f2ff : 0xffaa00);
+      materials.amberWire.opacity = (highlighted === 0 || highlighted === 3) ? 0.52 : 0.25;
 
-      // ----------------------------------------------------
-      // DRAW TEXT REUSABLE HELPER
-      // ----------------------------------------------------
-      const drawText = (txt, lx, ly, lz, color, fontSize = 10, align = 'left', bold = false, projFunc = project) => {
-        const p = projFunc(lx, ly, lz);
-        if (!p || p.scale < 0.15) return;
-
-        ctx.fillStyle = color;
-        ctx.textAlign = align;
-        ctx.font = `${bold ? 'bold' : ''} ${Math.floor(fontSize * p.scale)}px Courier, monospace`;
-        ctx.fillText(txt, p.x, p.y);
-      };
-
-      const drawCircle = (lx, ly, lz, radius, fillColor, shadowColor, projFunc = project) => {
-        const p = projFunc(lx, ly, lz);
-        if (!p) return;
-
-        ctx.fillStyle = fillColor;
-        if (shadowColor && p.scale > 0.4) {
-          ctx.shadowColor = shadowColor;
-          ctx.shadowBlur = 10 * p.scale;
-        }
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, radius * p.scale, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0; // reset
-      };
-
-      // ----------------------------------------------------
-      // DRAW 2. CODE EDITOR 3D WINDOW RENDER
-      // ----------------------------------------------------
-      const pt_editor = [
-        // Front corners
-        { x: -W_editor/2, y: -H_editor/2, z: 0 },
-        { x: W_editor/2, y: -H_editor/2, z: 0 },
-        { x: W_editor/2, y: H_editor/2, z: 0 },
-        { x: -W_editor/2, y: H_editor/2, z: 0 },
-        // Back corners
-        { x: -W_editor/2, y: -H_editor/2, z: -D_editor },
-        { x: W_editor/2, y: -H_editor/2, z: -D_editor },
-        { x: W_editor/2, y: H_editor/2, z: -D_editor },
-        { x: -W_editor/2, y: H_editor/2, z: -D_editor }
-      ];
-
-      const projEditor = pt_editor.map(p => project(p.x, p.y, p.z));
-
-      const isClipped = projEditor.some(p => p === null);
-
-      if (!isClipped) {
-        // 1. Back Plate
-        ctx.fillStyle = '#05070c';
-        ctx.beginPath();
-        ctx.moveTo(projEditor[4].x, projEditor[4].y);
-        ctx.lineTo(projEditor[5].x, projEditor[5].y);
-        ctx.lineTo(projEditor[6].x, projEditor[6].y);
-        ctx.lineTo(projEditor[7].x, projEditor[7].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // 2. Bezel Side Panels (extrusions)
-        // Left
-        ctx.fillStyle = '#0a101b';
-        ctx.beginPath();
-        ctx.moveTo(projEditor[7].x, projEditor[7].y);
-        ctx.lineTo(projEditor[4].x, projEditor[4].y);
-        ctx.lineTo(projEditor[0].x, projEditor[0].y);
-        ctx.lineTo(projEditor[3].x, projEditor[3].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // Right
-        ctx.fillStyle = '#060a12';
-        ctx.beginPath();
-        ctx.moveTo(projEditor[5].x, projEditor[5].y);
-        ctx.lineTo(projEditor[6].x, projEditor[6].y);
-        ctx.lineTo(projEditor[2].x, projEditor[2].y);
-        ctx.lineTo(projEditor[1].x, projEditor[1].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // Top
-        ctx.fillStyle = '#111b2b';
-        ctx.beginPath();
-        ctx.moveTo(projEditor[4].x, projEditor[4].y);
-        ctx.lineTo(projEditor[5].x, projEditor[5].y);
-        ctx.lineTo(projEditor[1].x, projEditor[1].y);
-        ctx.lineTo(projEditor[0].x, projEditor[0].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // Bottom
-        ctx.fillStyle = '#04060a';
-        ctx.beginPath();
-        ctx.moveTo(projEditor[3].x, projEditor[3].y);
-        ctx.lineTo(projEditor[2].x, projEditor[2].y);
-        ctx.lineTo(projEditor[6].x, projEditor[6].y);
-        ctx.lineTo(projEditor[7].x, projEditor[7].y);
-        ctx.closePath();
-        ctx.fill();
-
-        // 3. Front Face Window Frame & Main Panels
-        // Workspace body (Navy obsidian)
-        drawPanel(-W_editor/2, -H_editor/2, W_editor/2, H_editor/2, 0, '#0b1424', 'rgba(0, 242, 255, 0.1)');
-
-        // Title Header Bar
-        drawPanel(-W_editor/2, -H_editor/2, W_editor/2, -H_editor/2 + 28, 0, '#070c14', '#162235');
-
-        // Window red/yellow/green control lights
-        drawCircle(-W_editor/2 + 16, -H_editor/2 + 14, 0, 3.8, '#ff5f56', 'rgba(255, 95, 86, 0.4)');
-        drawCircle(-W_editor/2 + 27, -H_editor/2 + 14, 0, 3.8, '#ffbd2e', 'rgba(255, 189, 46, 0.4)');
-        drawCircle(-W_editor/2 + 38, -H_editor/2 + 14, 0, 3.8, '#27c93f', 'rgba(39, 201, 63, 0.4)');
-
-        // Header Title text
-        drawText('src/components/About.jsx - Editor', 0, -H_editor/2 + 18, 0, '#8fbcbb', 9, 'center', true);
-
-        // Sidebar Panel (File tree)
-        drawPanel(-W_editor/2, -H_editor/2 + 28, -W_editor/2 + 120, H_editor/2 - 20, 0, '#050912', '#162235');
-
-        // Sidebar Directory Contents
-        let sbY = -H_editor/2 + 45;
-        const dirList = [
-          { text: '📁 src', color: '#8fbcbb' },
-          { text: '  📁 components', color: '#8fbcbb' },
-          { text: '    📄 Hero.jsx', color: '#a3be8c' },
-          { text: '    📄 About.jsx', color: '#00f2ff', active: true },
-          { text: '    📄 Services.jsx', color: '#a3be8c' },
-          { text: '  📄 App.jsx', color: '#a3be8c' },
-          { text: '  📄 index.css', color: '#88c0d0' },
-          { text: '📄 package.json', color: '#b48ead' }
-        ];
-        dirList.forEach(item => {
-          if (item.active) {
-            drawPanel(-W_editor/2 + 4, sbY - 9, -W_editor/2 + 116, sbY + 4, 0, 'rgba(0, 242, 255, 0.1)', 'rgba(0, 242, 255, 0.22)');
-          }
-          drawText(item.text, -W_editor/2 + 10, sbY, 0, item.color, 9, 'left', item.active);
-          sbY += 16;
-        });
-
-        // Tab menu on top of code body
-        const tabX = -W_editor/2 + 120;
-        const tabY = -H_editor/2 + 28;
-        drawPanel(tabX, tabY, W_editor/2, tabY + 20, 0, '#070c14', '#162235');
-        // App.jsx tab active
-        drawPanel(tabX, tabY, tabX + 75, tabY + 20, 0, '#0b1424', '#162235');
-        drawPanel(tabX, tabY, tabX + 75, tabY + 2, 0, '#00f2ff', null);
-        drawText('About.jsx', tabX + 10, tabY + 13, 0, '#ffffff', 8.5);
-        drawText('×', tabX + 63, tabY + 13, 0, '#00f2ff', 9.5);
-
-        // index.css tab inactive
-        drawText('index.css', tabX + 85, tabY + 13, 0, '#abb2bf', 8.5);
-
-        // Render code lines (Workspace)
-        const startX = -W_editor/2 + 152;
-        let codeY = -H_editor/2 + 62;
-        const activeCode = (scrollPercent < 0.20)
-          ? getTypedLines(codeAppJsx, charsTyped)
-          : codeAppJsx;
-
-        activeCode.forEach((line, lineIdx) => {
-          // Draw line number
-          drawText(String(lineIdx + 1).padStart(2, ' '), startX - 22, codeY, 0, '#4b5263', 9.5);
-
-          // Highlights line
-          const tokens = tokenizeLine(line);
-          let tkX = startX;
-          const charW = 5.6; // local width spacing per character
-
-          tokens.forEach(tok => {
-            drawText(tok.text, tkX, codeY, 0, tok.color, 9.5);
-            tkX += tok.text.length * charW;
-          });
-
-          // Draw blinking typing cursor on Hero
-          if (scrollPercent < 0.20 && lineIdx === activeCode.length - 1) {
-            const cursorX = startX + line.length * charW;
-            if (Math.floor(time / 20) % 2 === 0) {
-              drawText('|', cursorX, codeY, 0, '#00f2ff', 10, 'left', true);
-            }
-          }
-          codeY += 14.5;
-        });
-
-        // ----------------------------------------------------
-        // MOCK COMPILATION TERMINAL LOGGER (Services)
-        // ----------------------------------------------------
-        // Drawer opens at H_editor/2 - 80
-        const termY1 = H_editor/2 - 80;
-        const termY2 = H_editor/2 - 20;
-        drawPanel(-W_editor/2 + 120, termY1, W_editor/2, termY2, 0, '#04060c', '#162235');
-
-        // Draw logs based on Services compile progress timer
-        let logs = [];
-        if (compileTimer > 0) {
-          logs.push({ text: '➜  landing_page_dev git:(master) npm run build', color: '#00f2ff' });
-          if (compileTimer > 25) logs.push({ text: '   vite v6.0.2 building for production...', color: '#abb2bf' });
-          if (compileTimer > 60) logs.push({ text: '   ✓ 28 modules transformed.', color: '#a3be8c' });
-          if (compileTimer > 95) logs.push({ text: '   dist/assets/index-D5f9G1.js  145.2 kB │ gzip: 42.1 kB', color: '#abb2bf' });
-          if (compileTimer > 120) logs.push({ text: '   ✔ compiled successfully in 320ms.', color: '#00f2ff', bold: true });
-        } else {
-          // Static local dev ready logs
-          logs = [
-            { text: '➜  landing_page_dev git:(master) npm run dev', color: '#abb2bf' },
-            { text: '   Vite v6.0.2 ready in 154 ms', color: '#5c6370' },
-            { text: '   ➜  Local:   http://localhost:5173/my-landing-page/', color: '#00f2ff' },
-            { text: '   ✔ HMR hot updates active', color: '#a3be8c' }
-          ];
-        }
-
-        let lY = termY1 + 12;
-        logs.slice(-4).forEach(log => {
-          drawText(log.text, -W_editor/2 + 128, lY, 0, log.color, 8.5, 'left', log.bold);
-          lY += 12;
-        });
-
-        // Status bar panel
-        drawPanel(-W_editor/2, H_editor/2 - 20, W_editor/2, H_editor/2, 0, '#060a12', '#162235');
-        drawText('⚙ master', -W_editor/2 + 10, H_editor/2 - 6, 0, '#8fbcbb', 8.5);
-        drawText('UTF-8', W_editor/2 - 90, H_editor/2 - 6, 0, '#8fbcbb', 8.5);
-        drawText('React 19.2', W_editor/2 - 45, H_editor/2 - 6, 0, '#00f2ff', 8.5, 'left', true);
-
-        // Neon outline overlay borders
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.28)';
-        ctx.lineWidth = 1.2 * projEditor[0].scale;
-        ctx.shadowColor = '#00f2ff';
-        ctx.shadowBlur = 12 * projEditor[0].scale;
-        ctx.beginPath();
-        ctx.moveTo(projEditor[0].x, projEditor[0].y);
-        ctx.lineTo(projEditor[1].x, projEditor[1].y);
-        ctx.lineTo(projEditor[2].x, projEditor[2].y);
-        ctx.lineTo(projEditor[3].x, projEditor[3].y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.shadowBlur = 0; // reset
+      // Let highlight pulses glow gently over time
+      const pulse = Math.sin(Date.now() * 0.005) * 0.5 + 0.5;
+      if (highlighted !== -1) {
+        pointLight.intensity = 6 + pulse * 4;
+        if (highlighted === 0) pointLight.position.set(-90, 0, 10);
+        else if (highlighted === 2) pointLight.position.set(90, 0, 10);
+        else pointLight.position.set(0, 20, 10);
+      } else {
+        pointLight.intensity = 2.5;
       }
 
-      // ----------------------------------------------------
-      // DRAW 3. WEB PREVIEW BROWSER 3D WINDOW (Projects)
-      // ----------------------------------------------------
-      if (editorState.split > 0.05) {
-        const splitVal = editorState.split;
+      // Rotate geodesic dome
+      luminaGroup.rotation.y += 0.002;
+      luminaGroup.rotation.x += 0.001;
 
-        // Position Browser window in tandem next to Editor
-        const pos_b = {
-          x: editorState.pos.x + W_editor * 0.58 * splitVal,
-          y: editorState.pos.y + 12 * splitVal,
-          z: editorState.pos.z - 20 * splitVal
-        };
+      // Rotate Apex blocks
+      block2.rotation.y += 0.004;
+      block2Wire.rotation.y += 0.004;
 
-        const rot_b = {
-          x: editorState.rot.x,
-          y: editorState.rot.y - 0.28 * splitVal,
-          z: editorState.rot.z
-        };
-
-        // Project coordinate using Browser state
-        const projectB = (lx, ly, lz) => {
-          return projectPoint(lx, ly, lz, pos_b, rot_b);
-        };
-
-        const pt_browser = [
-          // Front corners
-          { x: -W_browser/2, y: -H_browser/2, z: 0 },
-          { x: W_browser/2, y: -H_browser/2, z: 0 },
-          { x: W_browser/2, y: H_browser/2, z: 0 },
-          { x: -W_browser/2, y: H_browser/2, z: 0 },
-          // Back corners
-          { x: -W_browser/2, y: -H_browser/2, z: -D_browser },
-          { x: W_browser/2, y: -H_browser/2, z: -D_browser },
-          { x: W_browser/2, y: H_browser/2, z: -D_browser },
-          { x: -W_browser/2, y: H_browser/2, z: -D_browser }
-        ];
-
-        const projBrowser = pt_browser.map(p => projectB(p.x, p.y, p.z));
-
-        const isBClipped = projBrowser.some(p => p === null);
-
-        if (!isBClipped) {
-          // 1. Back Plate
-          ctx.fillStyle = '#04050a';
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[4].x, projBrowser[4].y);
-          ctx.lineTo(projBrowser[5].x, projBrowser[5].y);
-          ctx.lineTo(projBrowser[6].x, projBrowser[6].y);
-          ctx.lineTo(projBrowser[7].x, projBrowser[7].y);
-          ctx.closePath();
-          ctx.fill();
-
-          // 2. Bezel Side Panels
-          // Left
-          ctx.fillStyle = '#080c14';
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[7].x, projBrowser[7].y);
-          ctx.lineTo(projBrowser[4].x, projBrowser[4].y);
-          ctx.lineTo(projBrowser[0].x, projBrowser[0].y);
-          ctx.lineTo(projBrowser[3].x, projBrowser[3].y);
-          ctx.closePath();
-          ctx.fill();
-
-          // Right
-          ctx.fillStyle = '#05070d';
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[5].x, projBrowser[5].y);
-          ctx.lineTo(projBrowser[6].x, projBrowser[6].y);
-          ctx.lineTo(projBrowser[2].x, projBrowser[2].y);
-          ctx.lineTo(projBrowser[1].x, projBrowser[1].y);
-          ctx.closePath();
-          ctx.fill();
-
-          // Top
-          ctx.fillStyle = '#0f1725';
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[4].x, projBrowser[4].y);
-          ctx.lineTo(projBrowser[5].x, projBrowser[5].y);
-          ctx.lineTo(projBrowser[1].x, projBrowser[1].y);
-          ctx.lineTo(projBrowser[0].x, projBrowser[0].y);
-          ctx.closePath();
-          ctx.fill();
-
-          // Bottom
-          ctx.fillStyle = '#030407';
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[3].x, projBrowser[3].y);
-          ctx.lineTo(projBrowser[2].x, projBrowser[2].y);
-          ctx.lineTo(projBrowser[6].x, projBrowser[6].y);
-          ctx.lineTo(projBrowser[7].x, projBrowser[7].y);
-          ctx.closePath();
-          ctx.fill();
-
-          // 3. Front Window Panel
-          drawPanel(-W_browser/2, -H_browser/2, W_browser/2, H_browser/2, 0, '#060a12', 'rgba(255, 170, 0, 0.1)', projectB);
-
-          // Browser Header
-          drawPanel(-W_browser/2, -H_browser/2, W_browser/2, -H_browser/2 + 25, 0, '#04060c', '#162235', projectB);
-
-          // Back/Forward/Reload symbols
-          drawText('← → ↻', -W_browser/2 + 10, -H_browser/2 + 16, 0, '#8fbcbb', 9, 'left', false, projectB);
-
-          // URL Address Bar
-          drawPanel(-W_browser/2 + 65, -H_browser/2 + 5, W_browser/2 - 15, -H_browser/2 + 20, 0, '#090f1a', '#1d2c42', projectB);
-          drawCircle(-W_browser/2 + 73, -H_browser/2 + 12.5, 0, 2, '#27c93f', null, projectB); // Secure green padlock
-          drawText('https://arcova.io/dashboard', -W_browser/2 + 82, -H_browser/2 + 15, 0, '#88c0d0', 7.5, 'left', false, projectB);
-
-          // ----------------------------------------------------
-          // DRAW BUILDING CAD SIMULATION MODEL (Inside Browser)
-          // ----------------------------------------------------
-          const bAngle = time * 0.012; // slow horizontal rotate
-          const projBuilding = buildingVertices.map(v => {
-            const rot = rotateY(v, bAngle);
-            return projectB(rot.x, rot.y, rot.z);
-          });
-
-          // Draw building connections
-          ctx.lineWidth = 0.7;
-          buildingLines.forEach(([i1, i2]) => {
-            const p1 = projBuilding[i1];
-            const p2 = projBuilding[i2];
-            if (!p1 || !p2) return;
-
-            // Gradient line representing active CAD wireframe
-            ctx.strokeStyle = `rgba(255, 170, 0, ${0.36 * p1.scale})`;
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          });
-
-          // Draw building structural nodes (dots)
-          projBuilding.forEach(p => {
-            if (!p) return;
-            ctx.fillStyle = '#ffaa00';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 1.8 * p.scale, 0, Math.PI * 2);
-            ctx.fill();
-          });
-
-          // Floating Dashboard Analytics details
-          drawText('BIM STRUCTURAL SIMULATOR v1.0', -W_browser/2 + 15, -H_browser/2 + 42, 0, 'rgba(255, 170, 0, 0.7)', 8, 'left', true, projectB);
-          drawPanel(-W_browser/2 + 15, -H_browser/2 + 48, -W_browser/2 + 120, -H_browser/2 + 70, 0, 'rgba(255, 170, 0, 0.06)', 'rgba(255, 170, 0, 0.15)', projectB);
-          drawText('LOAD: ACTIVE 98%', -W_browser/2 + 20, -H_browser/2 + 58, 0, '#ffaa00', 7, 'left', true, projectB);
-          drawText('FPS: 60.0 STABLE', -W_browser/2 + 20, -H_browser/2 + 66, 0, '#27c93f', 7, 'left', true, projectB);
-
-          // Neon amber borders for Browser
-          ctx.strokeStyle = 'rgba(255, 170, 0, 0.28)';
-          ctx.lineWidth = 1.2 * projBrowser[0].scale;
-          ctx.shadowColor = '#ffaa00';
-          ctx.shadowBlur = 12 * projBrowser[0].scale;
-          ctx.beginPath();
-          ctx.moveTo(projBrowser[0].x, projBrowser[0].y);
-          ctx.lineTo(projBrowser[1].x, projBrowser[1].y);
-          ctx.lineTo(projBrowser[2].x, projBrowser[2].y);
-          ctx.lineTo(projBrowser[3].x, projBrowser[3].y);
-          ctx.closePath();
-          ctx.stroke();
-          ctx.shadowBlur = 0; // reset
+      // Float background data particles
+      const posArr = particleGeo.attributes.position.array;
+      for (let i = 1; i < posArr.length; i += 3) {
+        posArr[i] += 0.08; // Rise up
+        if (posArr[i] > 180) {
+          posArr[i] = -180; // Reset at bottom
         }
-
-        // ----------------------------------------------------
-        // DRAW FLOWING LASER ENERGY BEAMS (Code to Preview)
-        // ----------------------------------------------------
-        // Spawn beam trigger ticker
-        if (time % 35 === 0 && laserBeams.length < 4) {
-          laserBeams.push({
-            progress: 0,
-            yStart: (Math.random() - 0.5) * 160,
-            yEnd: (Math.random() - 0.5) * 140,
-            speed: 0.015 + Math.random() * 0.02
-          });
-        }
-
-        // Draw and update active laser beams
-        laserBeams = laserBeams.filter(beam => {
-          beam.progress += beam.speed;
-          if (beam.progress >= 1.0) return false; // dead
-
-          // Start relative to Editor local coords
-          const editorLocal = { x: W_editor/2 - 10, y: beam.yStart, z: 0 };
-          const worldStart = localToWorld(editorLocal.x, editorLocal.y, editorLocal.z, editorState.pos, editorState.rot);
-
-          // End relative to Browser local coords
-          const browserLocal = { x: -W_browser/2 + 10, y: beam.yEnd, z: 0 };
-          const worldEnd = localToWorld(browserLocal.x, browserLocal.y, browserLocal.z, pos_b, rot_b);
-
-          // Interpolated world coordinates
-          const wx = interpolate(worldStart.x, worldEnd.x, beam.progress);
-          const wy = interpolate(worldStart.y, worldEnd.y, beam.progress);
-          const wz = interpolate(worldStart.z, worldEnd.z, beam.progress);
-
-          // Project world coordinates
-          const p = projectWorld(wx, wy, wz);
-          if (p) {
-            const alpha = Math.sin(beam.progress * Math.PI) * 0.7; // fade at ends
-            ctx.fillStyle = `rgba(0, 242, 255, ${alpha})`;
-            ctx.shadowColor = '#00f2ff';
-            ctx.shadowBlur = 8 * p.scale;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 3.5 * p.scale, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // Draw a trailing laser vector tail
-            const pPrev = projectWorld(
-              interpolate(worldStart.x, worldEnd.x, Math.max(0, beam.progress - 0.06)),
-              interpolate(worldStart.y, worldEnd.y, Math.max(0, beam.progress - 0.06)),
-              interpolate(worldStart.z, worldEnd.z, Math.max(0, beam.progress - 0.06))
-            );
-            if (pPrev) {
-              ctx.strokeStyle = `rgba(0, 242, 255, ${alpha * 0.45})`;
-              ctx.lineWidth = 2.2 * p.scale;
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(pPrev.x, pPrev.y);
-              ctx.stroke();
-            }
-          }
-          return true;
-        });
       }
+      particleGeo.attributes.position.needsUpdate = true;
 
-      animId = requestAnimationFrame(animate);
+      // Render scene
+      renderer.render(scene, camera);
+
+      // Loop frame unless prefers-reduced-motion is active
+      if (!prefersReducedMotion) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
     };
 
-    // Calculate World Coordinate relative to window space rotations
-    const localToWorld = (lx, ly, lz, pos, rot) => {
-      let x = lx;
-      let y = ly;
-      let z = lz;
+    // Render single frame for static reduced-motion users
+    if (prefersReducedMotion) {
+      // Setup building heights to full construction
+      floors.forEach(floor => {
+        floor.visible = true;
+        floor.scale.y = 1;
+      });
+      renderer.render(scene, camera);
+    } else {
+      tick();
+    }
 
-      if (rot.y !== 0) {
-        const cosY = Math.cos(rot.y);
-        const sinY = Math.sin(rot.y);
-        const x1 = x * cosY + z * sinY;
-        const z1 = -x * sinY + z * cosY;
-        x = x1;
-        z = z1;
-      }
-      if (rot.x !== 0) {
-        const cosX = Math.cos(rot.x);
-        const sinX = Math.sin(rot.x);
-        const y1 = y * cosX - z * sinX;
-        const z1 = y * sinX + z * cosX;
-        y = y1;
-        z = z1;
-      }
-      if (rot.z !== 0) {
-        const cosZ = Math.cos(rot.z);
-        const sinZ = Math.sin(rot.z);
-        const x1 = x * cosZ - y * sinZ;
-        const y1 = x * sinZ + y * cosZ;
-        x = x1;
-        y = y1;
-      }
-
-      return {
-        x: x + pos.x,
-        y: y + pos.y,
-        z: z + pos.z
-      };
-    };
-
-    animate();
-
+    // Cleanup listeners and WebGL on unmount
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animId);
+      window.removeEventListener('scroll', handleScrollLocal);
+      window.removeEventListener('mousemove', handleMouseMoveLocal);
+      window.removeEventListener('resize', handleResizeLocal);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+      // Traversal cleanup of all WebGL geometries and materials in the scene
+      scene.traverse((object) => {
+        if (object.geometry) {
+          object.geometry.dispose();
+        }
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            object.material.forEach(mat => mat.dispose());
+          } else {
+            object.material.dispose();
+          }
+        }
+      });
+
+      // Dispose materials that may not be directly bound to a mesh in the scene
+      Object.values(materials).forEach(mat => {
+        if (mat) mat.dispose();
+      });
+      if (particleMat) particleMat.dispose();
+
+      renderer.dispose();
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-0"
-      style={{ background: '#070a12' }}
+      className="fixed inset-0 w-full h-full pointer-events-none z-0 bg-[#0c0d13]"
+      style={{ touchAction: 'none' }}
     />
   );
 };

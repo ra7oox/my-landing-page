@@ -1,33 +1,68 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../hooks/useLanguage';
 
 const Projects = () => {
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.15
+  const { t, lang } = useLanguage();
+  const [activeProject, setActiveProject] = useState('zenith'); // default central building
+
+  const projectsData = {
+    apex: {
+      badge: "Foundation",
+      titleKey: "projectsApex",
+      descKey: "projectsApexDesc",
+      loc: "New York",
+      stats: {
+        height: "120m",
+        floors: "28 Levels",
+        system: "Pre-fabricated Steel modular boxes"
+      }
+    },
+    zenith: {
+      badge: "Supertall",
+      titleKey: "projectsZenith",
+      descKey: "projectsZenithDesc",
+      loc: "Dubai",
+      stats: {
+        height: "450m",
+        floors: "98 Levels",
+        system: "Concrete diagrid perimeter frame"
+      }
+    },
+    lumina: {
+      badge: "Pavilion",
+      titleKey: "projectsLumina",
+      descKey: "projectsLuminaDesc",
+      loc: "Tokyo",
+      stats: {
+        height: "35m",
+        floors: "Spherical Grid",
+        system: "Interlocking geodesic space truss"
       }
     }
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" }
+  const handleProjectSelect = (id) => {
+    setActiveProject(id);
+    if (window.zoomToBuilding) {
+      window.zoomToBuilding(id);
     }
   };
 
-  const projectsData = [
-    { badge: "Foundation", name: "Apex Hub", loc: "New York" },
-    { badge: "Tower", name: "Zenith Spire", loc: "Dubai" },
-    { badge: "Skyline", name: "Lumina Grid", loc: "Tokyo" }
-  ];
+  // Trigger default zoom focus state on mount/viewport scroll
+  useEffect(() => {
+    if (window.zoomToBuilding) {
+      window.zoomToBuilding(activeProject);
+    }
+  }, []);
+
+  const pData = projectsData[activeProject];
 
   return (
-    <section id="projects" className="relative py-32 bg-navy-900 min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="projects" className="relative py-32 bg-transparent min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Top/bottom dark fades */}
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
+
       <div className="container px-6 mx-auto relative z-20">
         
         {/* Section Header */}
@@ -38,62 +73,123 @@ const Projects = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16 max-w-2xl mx-auto"
         >
-          <h2 className="font-sans font-bold text-4xl md:text-5xl text-white tracking-wide uppercase">
-            Featured Projects
+          <h2 
+            className="font-sans font-bold text-4xl md:text-5xl text-white tracking-wide uppercase"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            {t('projectsTitle')}
           </h2>
-          <div className="h-[2px] w-20 bg-gradient-to-r from-cyan-glow to-transparent mx-auto mt-4 mb-6 shadow-[0_0_10px_rgba(0,212,255,0.5)]" />
-          <p className="text-gray-400 font-sans text-lg">
-            Explore our architectural milestones and structural designs engineered to redefine modern skylines.
-          </p>
+          <div className="h-[2px] w-20 bg-gradient-to-r from-cyan-glow to-transparent mx-auto mt-4 mb-6 shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
         </motion.div>
 
-        {/* Projects Grid */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="projects-grid grid grid-cols-1 md:grid-cols-3 gap-8 w-full"
-        >
-          {projectsData.map((project, idx) => (
-            <motion.div 
-              key={idx}
-              variants={cardVariants}
-              whileHover={{ y: -12, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="project-card relative rounded-2xl overflow-hidden border border-cyan-glow/20 bg-navy-900/80 p-0 flex flex-col justify-end aspect-[3/4] cursor-none shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-cyan-glow/60 transition-all duration-300"
-            >
-              {/* CSS Art Background */}
-              <div className="section-bg absolute inset-0 z-0">
-                <div className="city-lights"></div>
-              </div>
-              
-              {/* Overlay shadow */}
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/95 via-navy-900/40 to-transparent z-10" />
+        {/* Dashboard Grid Layout */}
+        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch`}>
+          
+          {/* Project Selection Tabs (HUD Control Panel) - Left 5 cols */}
+          <div className="lg:col-span-5 flex flex-col gap-4 justify-center">
+            {Object.keys(projectsData).map((key) => {
+              const proj = projectsData[key];
+              const isActive = activeProject === key;
 
-              {/* Project Content */}
-              <div className="project-content relative z-20 p-8">
-                <div className="project-badge inline-block border border-cyan-glow text-cyan-glow text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-3 bg-cyan-glow/10">
-                  {project.badge}
-                </div>
-                <h3 className="text-2xl font-display font-bold text-white tracking-tight uppercase">
-                  {project.name}
-                </h3>
-                <p className="text-gray-400 text-sm mt-1 flex items-center gap-1">
-                  <span>📍</span> {project.loc}
-                </p>
-              </div>
+              return (
+                <motion.button
+                  key={key}
+                  onClick={() => handleProjectSelect(key)}
+                  whileHover={{ scale: 1.02, x: lang === 'ar' ? -5 : 5 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full text-left ${lang === 'ar' ? 'text-right' : 'text-left'} p-5 rounded-xl border backdrop-blur-md transition-all duration-300 cursor-none flex justify-between items-center ${
+                    isActive 
+                      ? 'bg-cyan-glow/10 border-cyan-glow shadow-[0_0_25px_rgba(0,242,255,0.15),inset_0_0_10px_rgba(0,242,255,0.05)]' 
+                      : 'bg-navy-800/40 border-cyan-glow/10 hover:border-cyan-glow/40 hover:bg-navy-800/60'
+                  }`}
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className={`text-[10px] uppercase tracking-widest font-mono ${isActive ? 'text-cyan-glow' : 'text-gray-500'}`}>
+                      {proj.badge}
+                    </span>
+                    <span className="text-xl font-bold font-sans text-white tracking-wide uppercase">
+                      {t(proj.titleKey)}
+                    </span>
+                  </div>
+                  
+                  {/* Selector Arrow Icon */}
+                  <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors duration-300 ${
+                    isActive ? 'border-cyan-glow text-cyan-glow' : 'border-cyan-glow/20 text-gray-500'
+                  }`}>
+                    {lang === 'ar' ? '←' : '→'}
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
 
-              {/* Hover sweep overlay */}
-              <div 
-                className="project-hover absolute inset-0 bg-cyan-glow flex flex-col items-center justify-center text-navy-900 font-sans font-bold text-xl uppercase tracking-wider z-30 opacity-0 hover:opacity-95 transition-opacity duration-300 pointer-events-none"
+          {/* Spacer - Middle 2 cols (allows the 3D model in background to be fully seen/focused) */}
+          <div className="hidden lg:block lg:col-span-3 pointer-events-none" />
+
+          {/* Project Detailed Specifications Display Card - Right 4 cols */}
+          <div className="lg:col-span-4 flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeProject}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.4 }}
+                className="w-full bg-navy-800/80 backdrop-blur-md border border-cyan-glow/30 p-8 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] flex flex-col justify-between"
               >
-                <span>View Project</span>
-                <span className="text-2xl mt-2">&rarr;</span>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+                <div>
+                  {/* Card Title & Location */}
+                  <div className="flex justify-between items-start">
+                    <span className="project-badge inline-block border border-amber-glow text-amber-glow text-[10px] px-3 py-1 rounded-full uppercase tracking-wider bg-amber-glow/10 font-mono">
+                      {pData.badge}
+                    </span>
+                    <span className="text-gray-400 text-xs flex items-center gap-1 font-mono">
+                      📍 {pData.loc}
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold text-white tracking-tight uppercase mt-4 mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {t(pData.titleKey)}
+                  </h3>
+                  
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6 font-sans">
+                    {t(pData.descKey)}
+                  </p>
+
+                  <div className="h-[1px] w-full bg-cyan-glow/10 mb-6" />
+
+                  {/* Structural specifications list */}
+                  <div className="flex flex-col gap-4 font-sans text-xs mb-8">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 font-mono">HEIGHT:</span>
+                      <span className="text-white font-bold">{pData.stats.height}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 font-mono">LEVELS:</span>
+                      <span className="text-white font-bold">{pData.stats.floors}</span>
+                    </div>
+                    <div className="flex justify-between flex-col gap-1">
+                      <span className="text-gray-500 font-mono">STRUCTURAL SYSTEM:</span>
+                      <span className="text-cyan-glow font-bold leading-tight">{pData.stats.system}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* View Project button CTA */}
+                <motion.a 
+                  href="#contact"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full py-3 rounded-md bg-cyan-glow text-black font-sans font-bold text-xs uppercase tracking-widest text-center cursor-none shadow-[0_0_20px_rgba(0,242,255,0.25)] hover:shadow-[0_0_40px_rgba(0,242,255,0.55)] transition-all duration-300 block select-none"
+                >
+                  {t('projectsBtn')}
+                </motion.a>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+        </div>
+
       </div>
     </section>
   );

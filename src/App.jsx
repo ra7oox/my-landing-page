@@ -1,4 +1,5 @@
 import React from 'react';
+import { LanguageProvider } from './hooks/useLanguage';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -10,7 +11,7 @@ import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
-    <>
+    <LanguageProvider>
       <Dev3DBackground />
       <CustomCursor />
       
@@ -20,7 +21,7 @@ function App() {
       <Services />
       <Projects />
       <Contact />
-    </>
+    </LanguageProvider>
   );
 }
 
