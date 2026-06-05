@@ -1,20 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useReveal } from '../hooks/useReveal';
 
 const Contact = () => {
+  const revealRef = useReveal();
+
   return (
-    <section id="contact" className="relative py-32 bg-navy-900 min-h-screen flex items-center justify-center overflow-hidden">
+    <section 
+      ref={revealRef}
+      id="contact" 
+      style={{
+        position: 'relative',
+        zIndex: 1,
+        background: 'rgba(7,18,32,0.98)'
+      }}
+      className="relative py-32 min-h-screen flex items-center justify-center overflow-hidden"
+    >
       <div className="container px-6 mx-auto relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           {/* Contact Info (Slide in from Left) */}
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="contact-info max-w-xl"
-          >
+          <div className="reveal-left contact-info max-w-xl">
             <h2 className="font-sans font-bold text-4xl md:text-5xl text-white tracking-wide uppercase">
               Start Your Project
             </h2>
@@ -37,15 +43,11 @@ const Contact = () => {
                 <span className="c-text font-sans">+1 (555) 019-8472</span>
               </div>
             </div>
-          </motion.div>
+          </div>
           
           {/* Contact Form (Slide in from Right) */}
-          <motion.form 
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="contact-form bg-navy-900/60 backdrop-blur-md border border-cyan-glow/20 p-8 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.6)] flex flex-col gap-5" 
+          <form 
+            className="reveal-right contact-form bg-navy-900/60 backdrop-blur-md border border-cyan-glow/20 p-8 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.6)] flex flex-col gap-5" 
             onSubmit={e => e.preventDefault()}
           >
             <div className="flex flex-col gap-1">
@@ -88,7 +90,7 @@ const Contact = () => {
             >
               SEND MESSAGE <span>&rarr;</span>
             </motion.button>
-          </motion.form>
+          </form>
           
         </div>
       </div>

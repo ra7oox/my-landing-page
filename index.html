@@ -4,8 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ARCOVA - Futuristic Construction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      body { margin:0; background:#040d18; overflow-x:hidden; }
+      #root { position:relative; z-index:1; }
+    </style>
   </head>
   <body>
+    <canvas id="three-bg" style="
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
+    "></canvas>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
