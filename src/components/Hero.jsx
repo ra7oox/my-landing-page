@@ -1,28 +1,7 @@
-import React, { useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const Hero = () => {
-  // 3D Mouse Parallax
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springX = useSpring(mouseX, { stiffness: 80, damping: 25 });
-  const springY = useSpring(mouseY, { stiffness: 80, damping: 25 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const moveX = (e.clientX - width / 2) / 30; // max 30px offset
-      const moveY = (e.clientY - height / 2) / 30;
-      mouseX.set(moveX);
-      mouseY.set(moveY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -40,20 +19,11 @@ const Hero = () => {
 
   return (
     <section 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-navy-900" 
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent" 
       id="hero"
     >
-      {/* High Fidelity 3D Render Background - Interactive 3D Parallax */}
-      <motion.div 
-        style={{ 
-          x: springX, 
-          y: springY,
-          backgroundImage: 'url(./hero-bg.png)',
-          scale: 1.15
-        }}
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#070a12] z-10" />
+      {/* Soft overlay gradient to blend with the canvas */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#070a12]/80 z-10 pointer-events-none" />
       
       <motion.div 
         variants={containerVariants}

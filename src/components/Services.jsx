@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const services = [
   { 
@@ -49,48 +49,16 @@ const services = [
 ];
 
 const Services = () => {
-  // 3D Mouse Parallax
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springX = useSpring(mouseX, { stiffness: 80, damping: 25 });
-  const springY = useSpring(mouseY, { stiffness: 80, damping: 25 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const moveX = (e.clientX - width / 2) / 30; // max 30px offset
-      const moveY = (e.clientY - height / 2) / 30;
-      mouseX.set(moveX);
-      mouseY.set(moveY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
-
   return (
     <section 
       id="services" 
-      className="relative py-32 bg-navy-900 min-h-screen flex items-center overflow-hidden"
+      className="relative py-32 bg-transparent min-h-screen flex items-center overflow-hidden"
     >
-      {/* Background Image with 3D Mouse Parallax */}
-      <motion.div 
-        style={{ 
-          x: springX, 
-          y: springY,
-          backgroundImage: 'url(./services-bg.png)',
-          scale: 1.15
-        }}
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-900/95 via-navy-800/60 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#070a12]/95 via-[#070a12]/60 to-transparent z-10 pointer-events-none" />
       
       <div className="container mx-auto px-6 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
-          {/* Left Column: Vertical Modular Tech Stack with Framer Motion Stagger */}
           <motion.div 
             initial="hidden"
             whileInView="visible"
@@ -121,7 +89,7 @@ const Services = () => {
                 }}
                 whileHover={{ x: 12, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className={`group relative bg-navy-800/65 backdrop-blur-md border border-cyan-glow/20 p-6 flex items-center gap-6 hover:bg-cyan-glow/10 duration-300 shadow-[0_0_20px_rgba(0,242,255,0.05),inset_0_0_15px_rgba(0,242,255,0.02)] hover:border-cyan-glow/65 hover:shadow-[0_0_30px_rgba(0,242,255,0.25),inset_0_0_20px_rgba(0,242,255,0.15)] cursor-none ${i === services.length - 1 ? 'rounded-b-2xl' : ''}`}
+                className={`group relative bg-navy-800/65 backdrop-blur-md border border-cyan-glow/20 p-6 flex items-center gap-6 hover:bg-cyan-glow/10 duration-300 shadow-[0_0_20px_rgba(0,242,255,0.05),inset_0_0_15px_rgba(0,242,255,0.02)] hover:border-cyan-glow/65 hover:shadow-[0_0_30px_rgba(0,242,255,0.25),inset_0_0_20px_rgba(0,242,255,0.15)] cursor-pointer ${i === services.length - 1 ? 'rounded-b-2xl' : ''}`}
               >
                 <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full border border-cyan-glow/30 bg-navy-900/80 text-cyan-glow group-hover:scale-110 group-hover:border-cyan-glow transition-all duration-300">
                   {svc.icon}
@@ -134,7 +102,6 @@ const Services = () => {
             ))}
           </motion.div>
           
-          {/* Right Column: Asymmetric space to frame the industrial background */}
           <div className="hidden lg:block" />
           
         </div>

@@ -1,31 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const About = () => {
   const statsRef = useRef(null);
   const [counted, setCounted] = useState(false);
   const [counts, setCounts] = useState({ projects: 0, years: 0, satisfaction: 0 });
-
-  // 3D Mouse Parallax
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springX = useSpring(mouseX, { stiffness: 80, damping: 25 });
-  const springY = useSpring(mouseY, { stiffness: 80, damping: 25 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const moveX = (e.clientX - width / 2) / 30; // max 30px offset
-      const moveY = (e.clientY - height / 2) / 30;
-      mouseX.set(moveX);
-      mouseY.set(moveY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -60,21 +39,10 @@ const About = () => {
   return (
     <section 
       id="about" 
-      className="relative min-h-screen py-32 flex items-center justify-center overflow-hidden bg-navy-900"
+      className="relative min-h-screen py-32 flex items-center justify-center overflow-hidden bg-transparent"
     >
-      {/* Background Image with 3D Mouse Parallax */}
-      <motion.div 
-        style={{ 
-          x: springX, 
-          y: springY,
-          backgroundImage: 'url(./about-bg.png)',
-          scale: 1.15
-        }}
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-      />
-      
       {/* Dark overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-900/95 via-navy-800/75 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#070a12]/95 via-[#070a12]/70 to-transparent z-10 pointer-events-none" />
       
       <div className="container relative z-20 px-6 mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -116,9 +84,9 @@ const About = () => {
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
               }}
-              className="stat-item bg-navy-900/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/50 transition-all duration-300"
+              className="stat-item bg-navy-800/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/50 transition-all duration-300"
             >
-              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,212,255,0.6)]">
+              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,242,255,0.6)]">
                 {counts.projects}+
               </div>
               <div className="stat-label text-xs uppercase tracking-widest text-gray-400 mt-2">Projects Completed</div>
@@ -129,7 +97,7 @@ const About = () => {
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
               }}
-              className="stat-item bg-navy-900/75 backdrop-blur-md border border-amber-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-amber-glow/50 transition-all duration-300"
+              className="stat-item bg-navy-800/75 backdrop-blur-md border border-amber-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-amber-glow/50 transition-all duration-300"
             >
               <div className="stat-number text-amber-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(255,170,0,0.6)]">
                 {counts.years}+
@@ -142,9 +110,9 @@ const About = () => {
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
               }}
-              className="stat-item bg-navy-900/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/50 transition-all duration-300"
+              className="stat-item bg-navy-800/75 backdrop-blur-md border border-cyan-glow/20 p-6 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center min-w-[200px] hover:border-cyan-glow/50 transition-all duration-300"
             >
-              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,212,255,0.6)]">
+              <div className="stat-number text-cyan-glow text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_rgba(0,242,255,0.6)]">
                 {counts.satisfaction}%
               </div>
               <div className="stat-label text-xs uppercase tracking-widest text-gray-400 mt-2">Client Satisfaction</div>

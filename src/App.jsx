@@ -5,13 +5,13 @@ import About from './components/About';
 import Services from './components/Services';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
-import ParticlesCanvas from './components/ParticlesCanvas';
+import Dev3DBackground from './components/Dev3DBackground';
 import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
     <>
-      <ParticlesCanvas />
+      <Dev3DBackground />
       <CustomCursor />
       
       <Navbar />
