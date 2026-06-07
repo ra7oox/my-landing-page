@@ -77,7 +77,7 @@ const Contact = () => {
         </svg>
       ),
       label: lang === 'ar' ? 'البريد الإلكتروني' : 'Email',
-      value: 'build@r7x.dev',
+      value: 'soufianearrahou7@gmail.com',
       action: copyEmail,
       actionLabel: emailCopied ? (lang === 'ar' ? 'تم النسخ' : 'Copied') : (lang === 'ar' ? 'نسخ' : 'Copy'),
       isCopied: emailCopied,
@@ -89,7 +89,7 @@ const Contact = () => {
         </svg>
       ),
       label: lang === 'ar' ? 'الهاتف' : 'Phone',
-      value: '+1 (555) 019-8472',
+      value: '+212632326544',
       action: copyPhone,
       actionLabel: phoneCopied ? (lang === 'ar' ? 'تم النسخ' : 'Copied') : (lang === 'ar' ? 'نسخ' : 'Copy'),
       isCopied: phoneCopied,
@@ -97,9 +97,9 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="relative py-20 md:py-28 lg:py-32 bg-[#070a12] min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="contact" className="relative py-20 md:py-28 lg:py-32 bg-navy-900 min-h-screen flex items-center justify-center overflow-hidden">
       {/* Backgrounds */}
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-navy-900 via-transparent to-navy-900" />
       <div className="absolute inset-0 z-0 opacity-[0.04] bg-[linear-gradient(to_right,#00f2ff_1px,transparent_1px),linear-gradient(to_bottom,#00f2ff_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
       <div className="container relative z-20 mx-auto max-w-[1200px] px-6">
@@ -116,12 +116,12 @@ const Contact = () => {
             {t('contactTitle')}
           </span>
           <h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-wide uppercase leading-tight mb-6"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-wide uppercase leading-tight mb-6"
             style={{ fontFamily: "'Syne', sans-serif" }}
           >
             {lang === 'ar' ? 'ابدأ مشروعك' : "Let's Build Together"}
           </h2>
-          <p className="text-gray-400 font-sans text-sm md:text-base leading-relaxed max-w-lg">
+          <p className="text-slate-600 dark:text-gray-400 font-sans text-sm md:text-base leading-relaxed max-w-lg">
             {t('contactDesc')}
           </p>
         </motion.div>
@@ -143,8 +143,7 @@ const Contact = () => {
                   key="form"
                   onSubmit={handleSubmit}
                   noValidate
-                  className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col gap-6"
-                  style={{ padding: '2rem' }}
+                  className="bg-navy-800/40 dark:bg-white/[0.02] backdrop-blur-xl border border-navy-700/30 dark:border-white/10 rounded-2xl flex flex-col gap-6 !p-5 sm:!p-8"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input
@@ -206,7 +205,7 @@ const Contact = () => {
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
-                  className="bg-white/[0.02] backdrop-blur-xl border border-cyan-500/30 p-12 rounded-2xl text-center flex flex-col items-center gap-6"
+                  className="bg-navy-800/40 dark:bg-white/[0.02] backdrop-blur-xl border border-cyan-500/30 p-12 rounded-2xl text-center flex flex-col items-center gap-6"
                 >
                   <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00f2ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -214,10 +213,10 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white tracking-wide font-sans mb-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-wide font-sans mb-2">
                       {t('contactSuccess')}
                     </h3>
-                    <p className="text-gray-400 text-sm font-sans font-light">
+                    <p className="text-slate-600 dark:text-gray-400 text-sm font-sans font-light">
                       {lang === 'ar' ? 'سأتواصل معك قريباً' : "I'll get back to you within 24 hours"}
                     </p>
                   </div>
@@ -245,16 +244,15 @@ const Contact = () => {
               {infoCards.map((card, i) => (
                 <div
                   key={i}
-                  className="group bg-white/[0.01] border border-white/[0.05] rounded-xl transition-all duration-300 hover:border-cyan-500/30 hover:bg-white/[0.03]"
-                  style={{ padding: '1.25rem' }}
+                  className="group bg-navy-800/20 dark:bg-white/[0.01] border border-navy-700/30 dark:border-white/[0.05] rounded-xl transition-all duration-300 hover:border-cyan-500/30 hover:bg-navy-800/40 dark:hover:bg-white/[0.03] !p-4 sm:!p-5"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:border-cyan-500/30 group-hover:bg-cyan-500/10 transition-all duration-300">
+                    <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-navy-700/30 dark:bg-white/5 border border-navy-600/30 dark:border-white/10 flex items-center justify-center text-cyan-400 group-hover:border-cyan-500/30 group-hover:bg-cyan-500/10 transition-all duration-300">
                       {card.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] tracking-widest font-mono text-white/40 font-semibold uppercase">{card.label}</span>
+                        <span className="text-[10px] tracking-widest font-mono text-slate-500/60 dark:text-white/40 font-semibold uppercase">{card.label}</span>
                         {card.action && (
                           <Button
                             variant="copy"
@@ -265,7 +263,7 @@ const Contact = () => {
                           </Button>
                         )}
                       </div>
-                      <span className="block text-white/90 font-sans text-sm font-medium tracking-wide mt-1.5">{card.value}</span>
+                      <span className="block text-slate-900/90 dark:text-white/90 font-sans text-sm font-medium tracking-wide mt-1.5">{card.value}</span>
                     </div>
                   </div>
                 </div>

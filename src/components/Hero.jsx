@@ -265,7 +265,7 @@ const Hero = () => {
         className="relative min-h-screen py-24 md:py-32 lg:py-40 flex items-center justify-center overflow-hidden bg-transparent" 
         id="hero"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#070a12]/90 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-navy-900/90 z-10 pointer-events-none" />
 
         <motion.div 
           variants={containerVariants}
@@ -275,8 +275,7 @@ const Hero = () => {
         >
           <motion.div
             variants={itemVariants}
-            className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-glow/20 bg-cyan-glow/5 text-cyan-glow text-[10px] font-mono tracking-[0.2em] uppercase"
-            style={{ padding: '6px 16px' }}
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-glow/20 bg-cyan-glow/5 text-cyan-glow text-[10px] font-mono tracking-[0.2em] uppercase !py-1.5 !px-4"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {lang === 'ar' ? 'جاهز للعمل' : 'AVAILABLE FOR PROJECTS'}
@@ -284,16 +283,16 @@ const Hero = () => {
 
           <motion.h1 
             variants={itemVariants}
-            className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-white tracking-widest uppercase leading-tight"
+            className="hero-title font-display font-black text-5xl md:text-7xl lg:text-8xl text-slate-900 dark:text-white tracking-widest uppercase leading-tight"
           >
-            <span className="bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-white dark:to-gray-300 bg-clip-text text-transparent">
               {t('heroTitle')}
             </span>
           </motion.h1>
           
           <motion.p 
             variants={itemVariants}
-            className="mt-6 font-sans text-sm md:text-base text-gray-400 tracking-[0.15em] uppercase font-light max-w-2xl leading-relaxed"
+            className="hero-subtitle mt-6 font-sans text-sm md:text-base text-slate-600 dark:text-gray-400 tracking-[0.15em] uppercase font-light max-w-2xl leading-relaxed"
           >
             {t('heroSubtitle')}
           </motion.p>

@@ -9,6 +9,29 @@ const Navbar = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState('dark');
+
+  // Initialize theme on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, []);
+
+  const handleThemeToggle = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    if (nextTheme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,11 +64,11 @@ const Navbar = () => {
       transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 h-16 z-100 flex justify-between items-center px-[5%] transition-all duration-500 ${
         scrolled 
-          ? 'bg-[#070a12]/95 backdrop-blur-xl border-b border-cyan-glow/15 shadow-[0_0_30px_rgba(0,242,255,0.05)]' 
+          ? 'bg-navy-900/95 backdrop-blur-xl border-b border-cyan-glow/15 shadow-sm dark:shadow-[0_0_30px_rgba(0,242,255,0.05)]' 
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <a href="#" className="flex items-center gap-3 font-display font-extrabold text-xl tracking-widest text-white uppercase select-none cursor-none group">
+      <a href="#" className="flex items-center gap-3 font-display font-extrabold text-xl tracking-widest text-slate-900 dark:text-white uppercase select-none cursor-none group">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan-glow drop-shadow-[0_0_8px_rgba(0,242,255,0.6)] group-hover:drop-shadow-[0_0_12px_rgba(0,242,255,0.9)] transition-all duration-300">
           <path d="M12 2L2 22H22L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
           <path d="M12 8L6 20H18L12 8Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1" />
@@ -60,6 +83,32 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Theme Toggle Button */}
+        <button 
+          onClick={handleThemeToggle}
+          className="relative p-2 rounded-full border border-cyan-glow/20 bg-navy-800/60 hover:bg-cyan-glow/10 text-cyan-glow cursor-none transition-all duration-300 hover:border-cyan-glow shadow-[0_0_15px_rgba(0,242,255,0.05)]"
+          title={theme === 'dark' ? t('themeLight') || 'Switch to Light Mode' : t('themeDark') || 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          )}
+        </button>
+
+        {/* Audio Toggle Button */}
         <button 
           onClick={handleAudioToggle}
           className="relative p-2 rounded-full border border-cyan-glow/20 bg-navy-800/60 hover:bg-cyan-glow/10 text-cyan-glow cursor-none transition-all duration-300 hover:border-cyan-glow shadow-[0_0_15px_rgba(0,242,255,0.05)]"
@@ -124,7 +173,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: i * 0.1 }}
-                className="text-gray-400 hover:text-cyan-glow transition-colors duration-300 text-2xl font-display tracking-[0.15em] uppercase cursor-none"
+                className="text-slate-600 dark:text-gray-400 hover:text-cyan-glow transition-colors duration-300 text-2xl font-display tracking-[0.15em] uppercase cursor-none"
               >
                 {item.label}
               </motion.a>

@@ -102,8 +102,8 @@ const Services = () => {
       id="services" 
       className="relative py-24 md:py-36 lg:py-44 bg-transparent min-h-screen flex items-center overflow-hidden"
     >
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
-      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[#070a12]/95 via-[#070a12]/30 to-transparent`} />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-navy-900 via-transparent to-navy-900" />
+      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-navy-900/95 via-navy-900/30 to-transparent`} />
       
       <div className="container mx-auto px-6 relative z-20 max-w-[1400px]">
         
@@ -118,18 +118,18 @@ const Services = () => {
             {t('servicesTitle')}
           </span>
           <h2 
-            className="text-3xl md:text-4xl font-bold text-white tracking-wide uppercase"
+            className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-wide uppercase"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             {lang === 'ar' ? 'الخدمات التي أقدمها' : 'What I Build'}
           </h2>
           <div className={`h-[2px] w-16 bg-cyan-glow mt-4 mb-6 ${lang === 'ar' ? 'mr-0 ml-auto' : 'ml-0'}`} />
-          <p className="text-gray-400 text-sm md:text-base leading-relaxed font-sans font-light">
+          <p className="text-slate-600 dark:text-gray-400 text-sm md:text-base leading-relaxed font-sans font-light">
             {t('servicesSubtitle')}
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-1 md:grid-cols-12 w-full" style={{ gap: '1.25rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-12 w-full !gap-5">
           {services.map((svc, i) => (
             <motion.div 
               key={i} 
@@ -141,26 +141,24 @@ const Services = () => {
               onMouseEnter={() => handleCardHover(svc.idx)}
               onMouseLeave={() => handleCardHover(-1)}
               onClick={() => handleCardClick(svc.projectKey)}
-              className={`group relative bg-[#0d1525]/70 backdrop-blur-md border border-white/5 flex items-start rounded-xl hover:bg-${svc.accent} duration-400 shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:border-cyan-glow/25 hover:shadow-[0_0_40px_rgba(0,242,255,0.1)] cursor-pointer ${svc.gridClass}`}
-              style={{ padding: '1.75rem', gap: '1.25rem' }}
+              className={`group relative bg-navy-800/70 backdrop-blur-md border border-navy-700/30 dark:border-white/5 flex items-start rounded-xl hover:bg-${svc.accent} duration-400 shadow-[0_0_30px_rgba(0,0,0,0.05),0_0_30px_rgba(0,0,0,0.45)_dark] hover:border-cyan-glow/25 hover:shadow-[0_0_40px_rgba(0,242,255,0.1)] cursor-pointer !p-5 sm:!p-7 !gap-5 ${svc.gridClass}`}
             >
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `linear-gradient(135deg, ${svc.accent})` }} />
               
-              <div className="relative z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl border border-cyan-glow/20 bg-[#070c14]/80 text-cyan-glow group-hover:scale-110 group-hover:border-cyan-glow/40 transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.05)]">
+              <div className="relative z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl border border-cyan-glow/20 bg-navy-700/80 text-cyan-glow group-hover:scale-110 group-hover:border-cyan-glow/40 transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.05)]">
                 {svc.icon}
               </div>
               
               <div className="relative z-10 flex flex-col gap-2 w-full">
-                <h4 className="font-sans font-bold text-white text-base tracking-wide group-hover:text-cyan-glow transition-colors duration-300 uppercase">
+                <h4 className="font-sans font-bold text-slate-900 dark:text-white text-base tracking-wide group-hover:text-cyan-glow transition-colors duration-300 uppercase">
                   {t(svc.titleKey)}
                 </h4>
-                <p className="font-sans text-gray-400 text-sm leading-relaxed font-light">
+                <p className="font-sans text-slate-600 dark:text-gray-400 text-sm leading-relaxed font-light">
                   {t(svc.descKey)}
                 </p>
                 <div className="mt-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span 
-                    className="text-[8px] font-mono text-cyan-glow/60 tracking-widest uppercase border border-cyan-glow/10 rounded"
-                    style={{ padding: '2px 8px' }}
+                    className="text-[8px] font-mono text-cyan-glow/60 tracking-widest uppercase border border-cyan-glow/10 rounded !py-0.5 !px-2"
                   >
                     {svc.languages}
                   </span>

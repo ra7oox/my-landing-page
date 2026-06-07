@@ -50,21 +50,21 @@ const About = () => {
       label: t('aboutStatProjects'),
       color: 'text-cyan-glow',
       borderColor: 'border-cyan-glow/20 hover:border-cyan-glow/60',
-      glowColor: 'rgba(0,242,255,0.5)',
+      glowColor: 'var(--color-cyan-dim)',
     },
     {
       value: counts.years + '+',
       label: t('aboutStatYears'),
       color: 'text-amber-glow',
       borderColor: 'border-amber-glow/20 hover:border-amber-glow/60',
-      glowColor: 'rgba(255,170,0,0.5)',
+      glowColor: 'var(--color-amber-dim)',
     },
     {
       value: counts.satisfaction + '%',
       label: t('aboutStatSatisfaction'),
-      color: 'text-violet-400',
-      borderColor: 'border-violet-400/20 hover:border-violet-400/60',
-      glowColor: 'rgba(168,85,247,0.5)',
+      color: 'text-violet-glow',
+      borderColor: 'border-violet-glow/20 hover:border-violet-glow/60',
+      glowColor: 'var(--color-violet-dim)',
     },
   ];
 
@@ -73,8 +73,8 @@ const About = () => {
       id="about" 
       className="relative min-h-screen py-24 md:py-36 lg:py-44 flex items-center justify-center overflow-hidden bg-transparent"
     >
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
-      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-[#070a12]/95 via-[#070a12]/50 to-transparent`} />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-navy-900 via-transparent to-navy-900" />
+      <div className={`absolute inset-0 z-10 pointer-events-none ${lang === 'ar' ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-navy-900/95 via-navy-900/50 to-transparent`} />
       
       <div className="container relative z-20 px-6 mx-auto">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
@@ -88,21 +88,20 @@ const About = () => {
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-glow/20 via-transparent to-amber-glow/20 rounded-2xl blur-xl opacity-50" />
             <div 
-              className="relative bg-navy-800/80 backdrop-blur-md border border-cyan-glow/20 rounded-2xl shadow-[0_0_60px_rgba(0,242,255,0.08),inset_0_0_30px_rgba(0,242,255,0.02)] max-w-xl"
-              style={{ padding: '2.5rem' }}
+              className="relative bg-navy-800/80 backdrop-blur-md border border-cyan-glow/20 rounded-2xl shadow-[0_0_60px_rgba(0,242,255,0.08),inset_0_0_30px_rgba(0,242,255,0.02)] max-w-xl !p-6 sm:!p-10"
             >
               <span className="text-cyan-glow text-[10px] uppercase tracking-[0.3em] font-mono font-bold block mb-4">
                 {t('aboutTitle')}
               </span>
               <h2 
-                className="font-bold text-3xl md:text-4xl text-white tracking-wide uppercase leading-tight"
+                className="font-bold text-3xl md:text-4xl text-slate-900 dark:text-white tracking-wide uppercase leading-tight"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
-                <span className="bg-gradient-to-r from-cyan-glow to-violet-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-cyan-glow to-violet-glow bg-clip-text text-transparent">
                   {t('aboutTagline')}
                 </span>
               </h2>
-              <p className="text-gray-400 font-sans text-sm md:text-base leading-relaxed mt-6 font-light">
+              <p className="text-slate-600 dark:text-gray-400 font-sans text-sm md:text-base leading-relaxed mt-6 font-light">
                 {t('aboutDesc')}
               </p>
               <div className="mt-8 flex gap-4 items-center">
@@ -111,7 +110,7 @@ const About = () => {
                     <div key={i} className="w-8 h-8 rounded-full border-2 border-navy-900 bg-gradient-to-br from-cyan-glow/30 to-violet-500/30" />
                   ))}
                 </div>
-                <span className="text-[10px] font-mono text-gray-500 tracking-wider uppercase">
+                <span className="text-[10px] font-mono text-slate-500 dark:text-gray-500 tracking-wider uppercase">
                   {lang === 'ar' ? 'فريق موزع عالمياً' : 'Global distributed team'}
                 </span>
               </div>
@@ -138,14 +137,13 @@ const About = () => {
                 }}
                 onMouseEnter={() => handleStatHover(true)}
                 onMouseLeave={() => handleStatHover(false)}
-                className={`group bg-navy-800/70 backdrop-blur-md border ${stat.borderColor} rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-300 cursor-none hover:shadow-[0_0_40px_rgba(0,242,255,0.08)]`}
-                style={{ padding: '1.5rem' }}
+                className={`group bg-navy-800/70 backdrop-blur-md border ${stat.borderColor} rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-300 cursor-none hover:shadow-[0_0_40px_rgba(0,242,255,0.08)] !p-4 sm:!p-6`}
               >
                 <div className="flex flex-col">
                   <div className={`${stat.color} text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_${stat.glowColor}] font-display`}>
                     {stat.value}
                   </div>
-                  <div className="text-[10px] uppercase tracking-widest text-gray-500 mt-1 font-mono">
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-gray-400 mt-1 font-mono">
                     {stat.label}
                   </div>
                 </div>

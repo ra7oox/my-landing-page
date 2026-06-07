@@ -15,10 +15,10 @@ const Input = ({
   ...props
 }) => {
   // Common styling classes for input fields
-  const baseInputClass = `w-full mt-1.5 bg-[#0b1120]/80 border text-white rounded-xl font-sans text-sm outline-none transition-all duration-300 placeholder-white/20 ${
+  const baseInputClass = `w-full mt-1.5 bg-slate-200/50 dark:bg-[#0b1120]/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white rounded-xl font-sans text-sm outline-none transition-all duration-300 placeholder-slate-400 dark:placeholder-white/20 ${
     error
       ? 'border-red-500/50 focus:border-red-500 focus:shadow-[0_0_20px_rgba(239,68,68,0.15)]'
-      : 'border-white/10 focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(0,242,255,0.15)]'
+      : 'focus:border-cyan-600 dark:focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(0,242,255,0.15)]'
   } ${className}`;
 
   const defaultStyle = { padding: '14px 18px' };
@@ -26,7 +26,7 @@ const Input = ({
   return (
     <div className="flex flex-col w-full">
       {label && (
-        <label className="text-[10px] tracking-widest text-white/50 font-bold uppercase font-mono px-1">
+        <label className="text-[10px] tracking-widest text-slate-600 dark:text-white/50 font-bold uppercase font-mono px-1">
           {label}
         </label>
       )}

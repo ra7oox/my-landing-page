@@ -597,8 +597,47 @@ const Dev3DBackground = () => {
       tick();
     }
 
+    // Function to apply colors based on current theme class on <html>
+    const updateThemeColors = () => {
+      const isLight = document.documentElement.classList.contains('light');
+      if (isLight) {
+        scene.fog.color.setHex(0xf8fafc);
+        ambientLight.color.setHex(0xe2e8f0);
+        // update materials
+        materials.cyanWire.color.setHex(0x0284c7);
+        materials.cyanGlow.color.setHex(0x0284c7);
+        materials.amberWire.color.setHex(0xd97706);
+        materials.amberNode.color.setHex(0xd97706);
+        materials.steel.color.setHex(0xe2e8f0);
+        materials.glass.color.setHex(0xd1d5db);
+      } else {
+        scene.fog.color.setHex(0x070a12);
+        ambientLight.color.setHex(0x0d1626);
+        // restore materials
+        materials.cyanWire.color.setHex(0x00f2ff);
+        materials.cyanGlow.color.setHex(0x00f2ff);
+        materials.amberWire.color.setHex(0xffaa00);
+        materials.amberNode.color.setHex(0xffaa00);
+        materials.steel.color.setHex(0x1d2c42);
+        materials.glass.color.setHex(0x0b1e36);
+      }
+    };
+
+    // Run initial theme colors update
+    updateThemeColors();
+
+    // Observe html class attribute mutations for real-time adjustments
+    const themeObserver = new MutationObserver(() => {
+      updateThemeColors();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
     // Cleanup listeners and WebGL on unmount
     return () => {
+      themeObserver.disconnect();
       window.removeEventListener('scroll', handleScrollLocal);
       window.removeEventListener('mousemove', handleMouseMoveLocal);
       window.removeEventListener('resize', handleResizeLocal);
@@ -631,7 +670,7 @@ const Dev3DBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none z-[-1] bg-[#070a12]"
+      className="fixed inset-0 w-full h-full pointer-events-none z-[-1] bg-navy-900"
       style={{ touchAction: 'none' }}
     />
   );

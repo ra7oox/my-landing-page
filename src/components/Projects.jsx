@@ -6,64 +6,178 @@ import Button from './Button';
 const Projects = () => {
   const { t, lang } = useLanguage();
   const [activeProject, setActiveProject] = useState('zenith');
+  const [activePlanIndex, setActivePlanIndex] = useState(0);
 
   const projectsData = {
     apex: {
       badge: "Web Application",
       titleKey: "projectsApex",
-      descKey: "projectsApexDesc",
       loc: "SaaS App",
       accent: "from-amber-glow",
-      languages: ["React", "Node.js", "Express", "PostgreSQL", "JavaScript"],
-      stats: {
-        height: "Fast TTI (<1.2s)",
-        floors: "Secure DB Integration",
-        system: "React, Node.js, and Express stack"
-      }
+      plans: [
+        { 
+          nameKey: "planApexSimple", 
+          descKey: "planApexSimpleDesc", 
+          price: "$150",
+          languages: ["React", "TailwindCSS", "Chart.js"],
+          stats: {
+            perf: "Fast Load Time",
+            scale: "Single Dashboard",
+            tech: "React & Chart.js UI"
+          }
+        },
+        { 
+          nameKey: "planApexInter", 
+          descKey: "planApexInterDesc", 
+          price: "$350",
+          languages: ["React", "Node.js", "Express", "PostgreSQL", "TailwindCSS"],
+          stats: {
+            perf: "Fast TTI (<1.2s)",
+            scale: "Secure DB Integration",
+            tech: "Full-stack Node/Postgres"
+          }
+        },
+        { 
+          nameKey: "planApex3D", 
+          descKey: "planApex3DDesc", 
+          price: "$600",
+          languages: ["Next.js", "Node.js", "Stripe", "PostgreSQL", "TailwindCSS", "TypeScript"],
+          stats: {
+            perf: "Ultra Secure Auth",
+            scale: "Multi-tenant / Teams",
+            tech: "Next.js, API, Stripe pay"
+          }
+        }
+      ]
     },
     zenith: {
       badge: "Showcase Portfolio",
       titleKey: "projectsZenith",
-      descKey: "projectsZenithDesc",
       loc: "3D Showcase",
       accent: "from-cyan-glow",
-      languages: ["Next.js", "Three.js", "GSAP", "TailwindCSS", "React"],
-      stats: {
-        height: "100/100 Lighthouse",
-        floors: "Dynamic SEO HUD",
-        system: "Next.js, Three.js, and GSAP library"
-      }
+      plans: [
+        { 
+          nameKey: "planZenithSimple", 
+          descKey: "planZenithSimpleDesc", 
+          price: "$50",
+          languages: ["HTML", "TailwindCSS", "React"],
+          stats: {
+            perf: "Fast TTI (<1.0s)",
+            scale: "1-3 Pages Layout",
+            tech: "React static build"
+          }
+        },
+        { 
+          nameKey: "planZenithInter", 
+          descKey: "planZenithInterDesc", 
+          price: "$90",
+          languages: ["React", "Framer Motion", "TailwindCSS"],
+          stats: {
+            perf: "60 FPS Animations",
+            scale: "Dynamic Routing",
+            tech: "React & Framer Motion"
+          }
+        },
+        { 
+          nameKey: "planZenith3D", 
+          descKey: "planZenith3DDesc", 
+          price: "$130",
+          languages: ["Next.js", "Three.js", "GSAP", "TailwindCSS", "React"],
+          stats: {
+            perf: "100/100 Lighthouse",
+            scale: "Dynamic SEO HUD",
+            tech: "Next.js, Three.js & GSAP"
+          }
+        }
+      ]
     },
     lumina: {
       badge: "Mobile Application",
       titleKey: "projectsLumina",
-      descKey: "projectsLuminaDesc",
       loc: "iOS & Android",
-      accent: "from-violet-400",
-      languages: ["React Native", "Expo", "Firebase", "iOS", "Android"],
-      stats: {
-        height: "60 FPS Animations",
-        floors: "Cross-Platform Build",
-        system: "React Native, Expo, and Firebase backend"
-      }
+      accent: "from-violet-glow",
+      plans: [
+        { 
+          nameKey: "planLuminaSimple", 
+          descKey: "planLuminaSimpleDesc", 
+          price: "$200",
+          languages: ["React Native", "Expo", "TailwindCSS"],
+          stats: {
+            perf: "Responsive Layout",
+            scale: "Single Platform App",
+            tech: "React Native & Expo"
+          }
+        },
+        { 
+          nameKey: "planLuminaInter", 
+          descKey: "planLuminaInterDesc", 
+          price: "$450",
+          languages: ["React Native", "Expo", "Firebase", "iOS", "Android"],
+          stats: {
+            perf: "60 FPS Animations",
+            scale: "Cross-Platform Build",
+            tech: "React Native & Firebase DB"
+          }
+        },
+        { 
+          nameKey: "planLumina3D", 
+          descKey: "planLumina3DDesc", 
+          price: "$800",
+          languages: ["React Native", "Expo", "Firebase", "Google Maps API", "Node.js"],
+          stats: {
+            perf: "Native Performance",
+            scale: "Real-time Tracking",
+            tech: "Maps, Live Sync & APIs"
+          }
+        }
+      ]
     },
     python: {
       badge: "Python Scripts",
       titleKey: "projectsPython",
-      descKey: "projectsPythonDesc",
       loc: "Automation Hub",
       accent: "from-emerald-400",
-      languages: ["Python", "Selenium", "Pandas", "BeautifulSoup", "FastAPI"],
-      stats: {
-        height: "10x Faster Tasks",
-        floors: "Custom Integration",
-        system: "BeautifulSoup, Selenium, Pandas, and Cron scheduling"
-      }
+      plans: [
+        { 
+          nameKey: "planPythonSimple", 
+          descKey: "planPythonSimpleDesc", 
+          price: "$40",
+          languages: ["Python", "BeautifulSoup"],
+          stats: {
+            perf: "Fast Script Exec",
+            scale: "Single Source Scraper",
+            tech: "BeautifulSoup parser"
+          }
+        },
+        { 
+          nameKey: "planPythonInter", 
+          descKey: "planPythonInterDesc", 
+          price: "$100",
+          languages: ["Python", "Selenium", "FastAPI"],
+          stats: {
+            perf: "10x Faster Tasks",
+            scale: "Custom API Integration",
+            tech: "Selenium & FastAPI"
+          }
+        },
+        { 
+          nameKey: "planPython3D", 
+          descKey: "planPython3DDesc", 
+          price: "$220",
+          languages: ["Python", "Selenium", "Pandas", "PostgreSQL", "Docker"],
+          stats: {
+            perf: "Fully Automated Flow",
+            scale: "Multi-source Pipelines",
+            tech: "Pandas & Postgres DB"
+          }
+        }
+      ]
     }
   };
 
   const handleProjectSelect = (id) => {
     setActiveProject(id);
+    setActivePlanIndex(0);
     if (window.zoomToBuilding) {
       window.zoomToBuilding(id);
     }
@@ -91,10 +205,26 @@ const Projects = () => {
   }, []);
 
   const pData = projectsData[activeProject];
+  const activePlan = pData.plans[activePlanIndex];
+
+  const getWhatsAppLink = () => {
+    const serviceName = t(pData.titleKey);
+    const planName = t(activePlan.nameKey);
+    const planPrice = activePlan.price;
+    
+    let text = "";
+    if (lang === 'ar') {
+      text = `مرحباً، أود حجز الخدمة: *${serviceName}* مع الخطة: *${planName}* (${planPrice}).`;
+    } else {
+      text = `Hello, I would like to book the service: *${serviceName}* with the plan: *${planName}* (${planPrice}).`;
+    }
+    
+    return `https://wa.me/212632326544?text=${encodeURIComponent(text)}`;
+  };
 
   return (
     <section id="projects" className="relative py-24 md:py-36 lg:py-44 bg-transparent min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#070a12] via-transparent to-[#070a12]" />
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-navy-900 via-transparent to-navy-900" />
       <div className="absolute inset-0 z-0 opacity-[0.03] bg-[linear-gradient(to_right,#00f2ff_1px,transparent_1px),linear-gradient(to_bottom,#00f2ff_1px,transparent_1px)] bg-[size:5rem_5rem] pointer-events-none" />
 
       <div className="container px-6 mx-auto relative z-20 max-w-[1400px]">
@@ -137,7 +267,7 @@ const Projects = () => {
                   className={`relative w-full text-left ${lang === 'ar' ? 'text-right' : 'text-left'} rounded-xl border backdrop-blur-xl transition-all duration-400 cursor-none overflow-hidden ${
                     isActive 
                       ? 'bg-gradient-to-r from-cyan-glow/[0.06] to-transparent border-cyan-glow/30 shadow-[0_0_30px_rgba(0,242,255,0.06)]' 
-                      : 'bg-[#0b1220]/30 border-white/5 hover:border-cyan-glow/15 hover:bg-[#0b1220]/50'
+                      : 'bg-navy-800/30 border-navy-700/30 dark:border-white/5 hover:border-cyan-glow/15 hover:bg-navy-800/50'
                   }`}
                 >
                   {isActive && (
@@ -149,10 +279,10 @@ const Projects = () => {
 
                   <div className="flex items-center justify-between w-full relative">
                     <div className="flex flex-col gap-1">
-                      <span className={`text-[9px] uppercase tracking-[0.22em] font-mono font-semibold ${isActive ? 'text-cyan-glow' : 'text-gray-400'}`}>
+                      <span className={`text-[9px] uppercase tracking-[0.22em] font-mono font-semibold ${isActive ? 'text-cyan-glow' : 'text-slate-500 dark:text-gray-400'}`}>
                         {numStr} // {proj.badge}
                       </span>
-                      <span className="text-lg font-bold font-sans text-white tracking-wider uppercase mt-0.5">
+                      <span className="text-lg font-bold font-sans text-slate-900 dark:text-white tracking-wider uppercase mt-0.5">
                         {t(proj.titleKey)}
                       </span>
                     </div>
@@ -160,7 +290,7 @@ const Projects = () => {
                     <div className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all duration-300 ${
                       isActive 
                         ? 'border-cyan-glow/30 bg-cyan-glow/10 text-cyan-glow' 
-                        : 'border-white/10 text-gray-500 bg-white/[0.01]'
+                        : 'border-navy-700/30 dark:border-white/10 text-slate-500 dark:text-gray-500 bg-navy-800/20 dark:bg-white/[0.01]'
                     }`}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         {lang === 'ar' ? <path d="m15 18-6-6 6-6" /> : <path d="m9 18 6-6-6-6" />}
@@ -182,8 +312,7 @@ const Projects = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-full bg-gradient-to-br from-[#0c1424]/90 to-[#070b14]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.65),inset_0_0_20px_rgba(0,242,255,0.03)] relative overflow-hidden flex flex-col gap-6"
-                style={{ padding: '2rem' }}
+                className="w-full bg-gradient-to-br from-navy-800/90 to-navy-900/95 backdrop-blur-xl border border-navy-700/50 dark:border-white/10 rounded-xl shadow-xl dark:shadow-[0_0_50px_rgba(0,0,0,0.65),inset_0_0_20px_rgba(0,242,255,0.03)] relative overflow-hidden flex flex-col !gap-5 !p-4 sm:!p-8"
               >
                 <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-cyan-glow/30 rounded-tl pointer-events-none" />
                 <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-cyan-glow/30 rounded-tr pointer-events-none" />
@@ -192,12 +321,11 @@ const Projects = () => {
 
                 <div className="flex justify-between items-center w-full select-none">
                   <span 
-                    className={`border ${pData.accent}/30 text-${pData.accent.replace('from-', '')} text-[9px] rounded font-mono uppercase bg-${pData.accent}/5`}
-                    style={{ padding: '4px 10px' }}
+                    className={`border ${pData.accent}/30 text-${pData.accent.replace('from-', '')} text-[9px] rounded font-mono uppercase bg-${pData.accent}/5 !py-1 !px-2.5`}
                   >
                     {pData.badge}
                   </span>
-                  <span className="text-gray-400 text-xs flex items-center gap-1.5 font-mono">
+                  <span className="text-slate-500 dark:text-gray-400 text-xs flex items-center gap-1.5 font-mono">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-glow">
                       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
@@ -205,44 +333,64 @@ const Projects = () => {
                     {pData.loc}
                   </span>
                 </div>
+
+                {/* Plan Selection Tabs at the top of the card details */}
+                <div className="flex border-b border-navy-700/30 dark:border-white/10 pb-4 justify-between select-none gap-2">
+                  {pData.plans.map((plan, idx) => {
+                    const isPlanActive = activePlanIndex === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActivePlanIndex(idx)}
+                        className={`flex-1 flex flex-col items-center justify-center rounded-lg border transition-all duration-300 ${
+                          isPlanActive
+                            ? 'border-cyan-glow/45 bg-cyan-glow/10 text-cyan-glow shadow-[0_0_15px_rgba(0,242,255,0.08)]'
+                            : 'border-navy-700/20 dark:border-white/5 bg-navy-800/20 dark:bg-white/[0.01] text-slate-500 dark:text-gray-400 hover:border-cyan-glow/20'
+                        } cursor-none !py-1.5 !px-1`}
+                      >
+                        <span className="text-[9px] font-bold tracking-wide uppercase text-center leading-tight">{t(plan.nameKey)}</span>
+                        <span className="text-xs font-mono font-extrabold mt-1">{plan.price}</span>
+                      </button>
+                    );
+                  })}
+                </div>
                 
                 <div className="flex flex-col gap-2">
-                  <h3 className="text-xl md:text-2xl font-bold text-white tracking-wider uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-wider uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     {t(pData.titleKey)}
                   </h3>
-                  <p className="text-gray-300 text-sm leading-relaxed font-sans font-light">
-                    {t(pData.descKey)}
+                  <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed font-sans font-light">
+                    {t(activePlan.descKey)}
                   </p>
                 </div>
 
-                <div className="h-[1px] w-full bg-gradient-to-r from-cyan-glow/20 via-white/10 to-transparent select-none" />
+                <div className="h-[1px] w-full bg-gradient-to-r from-cyan-glow/20 via-navy-700/30 dark:via-white/10 to-transparent select-none" />
 
-                <div className="flex flex-col font-sans text-xs select-none" style={{ gap: '1.25rem' }}>
-                  <div className="grid grid-cols-2" style={{ gap: '1.25rem' }}>
-                    <div className="bg-[#070a12]/60 border border-white/10 rounded-lg flex flex-col gap-1.5 relative overflow-hidden" style={{ padding: '1.25rem' }}>
+                <div className="flex flex-col font-sans text-xs select-none !gap-4 sm:!gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 !gap-4 sm:!gap-5">
+                    <div className="bg-navy-800/60 border border-navy-700/50 dark:border-white/10 rounded-lg flex flex-col gap-1.5 relative overflow-hidden !p-4 sm:!p-5">
                       <span className="text-[9px] font-mono text-cyan-glow/70 tracking-wider font-semibold">PERFORMANCE:</span>
-                      <span className="text-base font-bold text-white tracking-wide">{pData.stats.height}</span>
+                      <span className="text-base font-bold text-slate-900 dark:text-white tracking-wide">{activePlan.stats.perf}</span>
                       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-cyan-glow/50 to-transparent" />
                     </div>
-                    <div className="bg-[#070a12]/60 border border-white/10 rounded-lg flex flex-col gap-1.5 relative overflow-hidden" style={{ padding: '1.25rem' }}>
+                    <div className="bg-navy-800/60 border border-navy-750/50 dark:border-white/10 rounded-lg flex flex-col gap-1.5 relative overflow-hidden !p-4 sm:!p-5">
                       <span className="text-[9px] font-mono text-cyan-glow/70 tracking-wider font-semibold">SCALE:</span>
-                      <span className="text-base font-bold text-white tracking-wide">{pData.stats.floors}</span>
+                      <span className="text-base font-bold text-slate-900 dark:text-white tracking-wide">{activePlan.stats.scale}</span>
                       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-amber-glow/50 to-transparent" />
                     </div>
                   </div>
 
-                  <div className="bg-[#070a12]/60 border border-white/10 rounded-lg flex flex-col gap-2 relative overflow-hidden" style={{ padding: '1.25rem' }}>
-                    <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
+                  <div className="bg-navy-800/60 border border-navy-700/50 dark:border-white/10 rounded-lg flex flex-col gap-2 relative overflow-hidden !p-4 sm:!p-5">
+                    <div className="flex items-center justify-between border-b border-navy-700/30 dark:border-white/10 pb-1.5">
                       <span className="text-[9px] font-mono text-cyan-glow/70 tracking-wider font-semibold">TECH STACK:</span>
                       <span 
-                        className="text-[8px] font-mono text-cyan-glow/90 rounded bg-cyan-glow/15 border border-cyan-glow/30"
-                        style={{ padding: '3px 8px' }}
+                        className="text-[8px] font-mono text-cyan-glow/90 rounded bg-cyan-glow/15 border border-cyan-glow/30 !py-0.5 !px-2"
                       >
                         VERIFIED
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-white leading-normal tracking-wide">
-                      {pData.stats.system}
+                    <span className="text-sm font-bold text-slate-900 dark:text-white leading-normal tracking-wide">
+                      {activePlan.stats.tech}
                     </span>
                     <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-cyan-glow/30" />
                   </div>
@@ -251,11 +399,10 @@ const Projects = () => {
                 <div className="flex flex-col gap-2.5 select-none">
                   <span className="text-[9px] font-mono text-cyan-glow/70 tracking-wider font-semibold">LANGUAGES & TECHNOLOGIES:</span>
                   <div className="flex flex-wrap gap-2">
-                    {pData.languages.map((langName, idx) => (
+                    {activePlan.languages.map((langName, idx) => (
                       <span 
                         key={idx} 
-                        className="text-[10px] font-mono font-bold rounded bg-cyan-glow/10 border border-cyan-glow/30 text-white shadow-[0_0_15px_rgba(0,242,255,0.05)]"
-                        style={{ padding: '6px 12px' }}
+                        className="text-[10px] font-mono font-bold rounded bg-cyan-glow/10 border border-cyan-glow/30 text-slate-900 dark:text-white shadow-[0_0_15px_rgba(0,242,255,0.05)] !py-1.5 !px-3"
                       >
                         {langName}
                       </span>
@@ -263,15 +410,28 @@ const Projects = () => {
                   </div>
                 </div>
 
-                <Button
-                  as="a"
-                  href="https://ra7oox.github.io/my-portfolio/#portfolio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="secondary"
-                >
-                  {t('projectsBtn')}
-                </Button>
+                <div className="flex gap-4 w-full">
+                  <Button
+                    as="a"
+                    href="https://ra7oox.github.io/my-portfolio/#portfolio"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="secondary"
+                    className="flex-1 !min-w-0"
+                  >
+                    {t('projectsBtn')}
+                  </Button>
+                  <Button
+                    as="a"
+                    href={getWhatsAppLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="primary"
+                    className="flex-1 !min-w-0"
+                  >
+                    {t('projectsBook')}
+                  </Button>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>

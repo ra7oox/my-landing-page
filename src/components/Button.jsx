@@ -16,11 +16,11 @@ const Button = ({
   // Variant base class mappings
   const variants = {
     primary:
-      'group relative w-full md:w-fit md:min-w-[240px] self-center bg-[#0b0f19] bg-gradient-to-r from-cyan-950/60 via-[#070a12] to-violet-950/30 border border-cyan-glow/40 text-cyan-glow py-4 rounded-xl font-display font-extrabold tracking-widest text-xs uppercase transition-all duration-300 hover:from-cyan-glow hover:to-violet-glow hover:text-navy-900 hover:border-transparent hover:shadow-[0_0_35px_rgba(0,242,255,0.4),0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center gap-3 overflow-hidden shadow-[0_0_20px_rgba(0,242,255,0.15),inset_0_0_12px_rgba(0,242,255,0.05)]',
+      'group relative w-full md:w-fit md:min-w-[240px] self-center bg-navy-900 bg-gradient-to-r from-cyan-glow/10 via-navy-900 to-violet-glow/10 border border-cyan-glow/40 text-cyan-glow py-4 rounded-xl font-display font-extrabold tracking-widest text-xs uppercase transition-all duration-300 hover:from-cyan-glow hover:to-violet-glow hover:text-navy-900 hover:border-transparent hover:shadow-[0_0_35px_rgba(0,242,255,0.4),0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center gap-3 overflow-hidden shadow-[0_0_20px_rgba(0,242,255,0.15),inset_0_0_12px_rgba(0,242,255,0.05)]',
     secondary:
       'group relative w-full md:w-fit md:min-w-[200px] self-center border border-cyan-glow/40 text-cyan-glow bg-cyan-glow/5 py-4 rounded-xl font-display font-extrabold text-xs uppercase tracking-widest text-center cursor-none shadow-[0_0_20px_rgba(0,242,255,0.1),inset_0_0_10px_rgba(0,242,255,0.03)] hover:bg-gradient-to-r hover:from-cyan-glow hover:to-violet-glow hover:text-navy-900 hover:border-transparent hover:shadow-[0_0_35px_rgba(0,242,255,0.35)] transition-all duration-300 flex items-center justify-center gap-3 select-none overflow-hidden',
     hero:
-      'block rounded-lg bg-navy-900/90 hover:bg-navy-900/70 backdrop-blur-md text-white font-sans font-bold tracking-widest text-xs md:text-sm uppercase cursor-none transition-all duration-300 select-none',
+      'block rounded-lg bg-navy-900/90 hover:bg-navy-900/70 backdrop-blur-md text-slate-900 dark:text-white font-sans font-bold tracking-widest text-xs md:text-sm uppercase cursor-none transition-all duration-300 select-none',
     nav:
       'nav-btn cursor-none font-display font-extrabold tracking-wider text-xs uppercase border border-amber-glow text-amber-glow rounded hover:bg-amber-glow hover:text-black duration-300 select-none shadow-[0_0_15px_rgba(255,170,0,0.15)]',
     copy:
