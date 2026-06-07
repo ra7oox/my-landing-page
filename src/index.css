@@ -412,33 +412,7 @@ nav {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Mobile Menu Overlay */
-.mobile-menu {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--bg-mobile-menu);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  z-index: 99;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-}
-.mobile-menu a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 24px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 300;
-  transition: all 0.3s;
-  font-family: var(--font-display);
-}
-.mobile-menu a:hover {
-  color: var(--cyan);
-}
+/* Obsolete Mobile Menu Overlay removed - now using dynamic Framer Motion sidebar */
 
 /* HERO */
 #hero {
@@ -879,8 +853,6 @@ nav {
 @media (max-width: 768px) {
   .nav-links, .nav-btn { display: none; }
   .hamburger { display: flex; }
-  .hamburger.active + .mobile-menu,
-  .mobile-menu.open { display: flex; }
   .container { grid-template-columns: 1fr !important; }
   .hero-title { font-size: 36px; }
   .hero-subtitle { font-size: 11px; }

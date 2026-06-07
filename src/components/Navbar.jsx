@@ -156,40 +156,73 @@ const Navbar = () => {
 
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mobile-menu open"
-            style={{ display: 'flex' }}
-          >
-            {navItems.map((item, i) => (
-              <motion.a
-                key={item.href}
-                href={item.href}
-                onClick={closeMobile}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: i * 0.1 }}
-                className="text-slate-600 dark:text-gray-400 hover:text-cyan-glow transition-colors duration-300 text-2xl font-display tracking-[0.15em] uppercase cursor-none"
-              >
-                {item.label}
-              </motion.a>
-            ))}
-            <Button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: 0.5 }}
-              onClick={() => { setLang(lang === 'en' ? 'ar' : 'en'); }}
-              variant="secondary"
-              className="mt-8 px-6 py-3 rounded-lg text-sm w-auto"
+          <>
+            {/* Backdrop Overlay with blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={closeMobile}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[98] md:hidden cursor-pointer"
+            />
+
+            {/* Sidebar menu panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className={`fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] bg-[var(--bg-mobile-menu)] border-l border-cyan-glow/15 dark:border-white/10 z-[99] flex flex-col justify-between p-8 pt-24 shadow-2xl md:hidden ${
+                lang === 'ar' ? 'text-right items-end' : 'text-left items-start'
+              }`}
             >
-              {lang === 'en' ? 'العربية' : 'English'}
-            </Button>
-          </motion.div>
+              <div className={`flex flex-col gap-6 w-full ${lang === 'ar' ? 'items-end' : 'items-start'}`}>
+                {navItems.map((item, i) => (
+                  <motion.a
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobile}
+                    initial={{ x: lang === 'ar' ? -30 : 30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: lang === 'ar' ? -30 : 30, opacity: 0 }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 150, damping: 20 }}
+                    className="text-slate-600 dark:text-gray-400 hover:text-cyan-glow transition-colors duration-300 text-xl font-display font-semibold tracking-[0.1em] uppercase cursor-none w-full py-2 border-b border-navy-700/10 dark:border-white/5"
+                  >
+                    {item.label}
+                  </motion.a>
+                ))}
+              </div>
+
+              <div className="flex flex-col gap-4 w-full mt-auto">
+                <Button
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ delay: navItems.length * 0.06 }}
+                  onClick={() => { setLang(lang === 'en' ? 'ar' : 'en'); closeMobile(); }}
+                  variant="secondary"
+                  className="w-full text-xs font-mono font-bold"
+                >
+                  {lang === 'en' ? 'العربية' : 'English'}
+                </Button>
+                
+                <Button
+                  as="a"
+                  href="#contact"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ delay: (navItems.length + 1) * 0.06 }}
+                  onClick={closeMobile}
+                  variant="primary"
+                  className="w-full text-xs font-mono font-bold"
+                >
+                  {t('navBtn')}
+                </Button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.nav>
