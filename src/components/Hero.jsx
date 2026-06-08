@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import { useLanguage } from '../hooks/useLanguage';
 import Button from './Button';
+import { speakRobotWelcome } from '../utils/audio';
 
 const Hero = () => {
   const { t, lang } = useLanguage();
@@ -25,6 +26,13 @@ const Hero = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Trigger robot welcome speech on load completion
+  useEffect(() => {
+    if (!loading) {
+      speakRobotWelcome(lang);
+    }
+  }, [loading, lang]);
 
   // WebGL 3D loader canvas animation
   useEffect(() => {

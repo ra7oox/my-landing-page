@@ -96,3 +96,41 @@ export const stopAudio = () => {
   }
   audioCtx = null;
 };
+
+let hasSpokenWelcome = false;
+let lastSpokenLanguage = null;
+
+export const speakRobotWelcome = (lang = 'en', force = false) => {
+  if (!('speechSynthesis' in window)) return;
+
+  const savedAudio = localStorage.getItem('audio_prefer');
+  if (savedAudio === 'disabled') return;
+
+  if (hasSpokenWelcome && lastSpokenLanguage === lang && !force) return;
+
+  // Cancel previous speech to avoid queue buildup
+  window.speechSynthesis.cancel();
+
+  const text = lang === 'ar' ? "مرحباً بكم في آر سفن إكس ديف" : "Welcome to R7x Dev";
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang === 'ar' ? 'ar-EG' : 'en-US';
+
+  // Apply parameters for robotic sound
+  utterance.pitch = 0.75;
+  utterance.rate = 0.9;
+  utterance.volume = 1.0;
+
+  utterance.onstart = () => {
+    hasSpokenWelcome = true;
+    lastSpokenLanguage = lang;
+  };
+
+  utterance.onend = () => {
+    hasSpokenWelcome = true;
+    lastSpokenLanguage = lang;
+  };
+
+  window.speechSynthesis.speak(utterance);
+  hasSpokenWelcome = true;
+  lastSpokenLanguage = lang;
+};

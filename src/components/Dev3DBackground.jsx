@@ -71,6 +71,53 @@ const Dev3DBackground = () => {
       glass: new THREE.MeshPhongMaterial({ color: 0x0b1e36, transparent: true, opacity: 0.35, shininess: 80 })
     };
 
+    // Safe rounded rectangle helper for canvas text sprites
+    const createTextSprite = (text, glowColor) => {
+      const sCanvas = document.createElement('canvas');
+      sCanvas.width = 256;
+      sCanvas.height = 64;
+      const sCtx = sCanvas.getContext('2d');
+
+      const drawRoundRect = (ctx, x, y, width, height, radius) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      };
+
+      // Glassmorphic background
+      sCtx.fillStyle = 'rgba(11, 20, 36, 0.85)';
+      drawRoundRect(sCtx, 4, 4, 248, 56, 12);
+      sCtx.fill();
+
+      // Glowing border
+      sCtx.strokeStyle = glowColor;
+      sCtx.lineWidth = 2.5;
+      sCtx.stroke();
+
+      // Bold text formatting
+      sCtx.fillStyle = '#ffffff';
+      sCtx.font = 'bold 19px Courier, monospace';
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.shadowColor = glowColor;
+      sCtx.shadowBlur = 8;
+      sCtx.fillText(text, 128, 32);
+
+      const tex = new THREE.CanvasTexture(sCanvas);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(38, 9.5, 1);
+      return sprite;
+    };
+
     // ----------------------------------------------------
     // 1. ZENITH SPIRE (Center, x = 0, y = 0, z = 0)
     // ----------------------------------------------------
@@ -193,6 +240,100 @@ const Dev3DBackground = () => {
     }
 
     // ----------------------------------------------------
+    // 3B. ROBOT 3D & DEVELOPMENT TAGS
+    // ----------------------------------------------------
+    const robotGroup = new THREE.Group();
+    // Hover next to Zenith Spire
+    robotGroup.position.set(40, 10, 45);
+    cityGroup.add(robotGroup);
+
+    // Robot body (Steel sphere)
+    const robotBodyGeo = new THREE.SphereGeometry(3.5, 16, 16);
+    const robotBody = new THREE.Mesh(robotBodyGeo, materials.steel);
+    robotGroup.add(robotBody);
+
+    // Robot visor (Neon glowing box)
+    const visorGeo = new THREE.BoxGeometry(4.2, 0.9, 1.8);
+    const visorMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.95 });
+    const visorMesh = new THREE.Mesh(visorGeo, visorMat);
+    visorMesh.position.set(0, 0.8, 2.8);
+    robotGroup.add(visorMesh);
+
+    // Antenna (Thin wire + node tip)
+    const antennaGeo = new THREE.CylinderGeometry(0.08, 0.08, 3, 8);
+    const antennaMesh = new THREE.Mesh(antennaGeo, materials.cyanWire);
+    antennaMesh.position.set(0, 3.5, 0);
+    robotGroup.add(antennaMesh);
+    
+    const antNodeGeo = new THREE.SphereGeometry(0.35, 8, 8);
+    const antNodeMesh = new THREE.Mesh(antNodeGeo, materials.amberNode);
+    antNodeMesh.position.set(0, 5, 0);
+    robotGroup.add(antNodeMesh);
+
+    // Side engines/thrusters (Left and Right)
+    const thrusterGeo = new THREE.CylinderGeometry(0.6, 0.45, 2.5, 8);
+    const thrusterLeft = new THREE.Mesh(thrusterGeo, materials.steel);
+    thrusterLeft.position.set(-4, -0.8, 0);
+    thrusterLeft.rotation.z = Math.PI / 8;
+    
+    const thrusterRight = thrusterLeft.clone();
+    thrusterRight.position.x = 4;
+    thrusterRight.rotation.z = -Math.PI / 8;
+    
+    robotGroup.add(thrusterLeft);
+    robotGroup.add(thrusterRight);
+
+    // Thruster engine flames (for scale pulsing animation in tick)
+    const flameGeo = new THREE.ConeGeometry(0.4, 1.6, 8);
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.85 });
+    
+    const flameLeft = new THREE.Mesh(flameGeo, flameMat);
+    flameLeft.position.set(-4.4, -2.2, 0);
+    flameLeft.rotation.z = Math.PI / 8;
+    
+    const flameRight = flameLeft.clone();
+    flameRight.position.x = 4.4;
+    flameRight.rotation.z = -Math.PI / 8;
+
+    robotGroup.add(flameLeft);
+    robotGroup.add(flameRight);
+
+    // Speech bubble above robot
+    const robotSpeech = createTextSprite("Welcome to R7x Dev", "#00f2ff");
+    robotSpeech.position.set(0, 8.5, 0);
+    robotSpeech.scale.set(28, 7, 1);
+    robotGroup.add(robotSpeech);
+
+    // Coding floating text tags (signifying development environment)
+    const codingGroup = new THREE.Group();
+    cityGroup.add(codingGroup);
+
+    const devTags = ['const', 'function', '<div>', '{ ... }', 'map()', 'promise', 'async', 'return', 'import', 'React', 'Three.js', 'remotion', 'npm'];
+    const codingSprites = [];
+
+    devTags.forEach((tag, idx) => {
+      const color = idx % 2 === 0 ? '#00f2ff' : '#ffaa00';
+      const sprite = createTextSprite(tag, color);
+      
+      // Scatter coding sprites in 3D space around the city
+      const x = (Math.random() - 0.5) * 180;
+      const y = Math.random() * 90 - 30;
+      const z = (Math.random() - 0.5) * 120;
+      
+      sprite.position.set(x, y, z);
+      sprite.scale.set(15, 3.75, 1);
+      
+      codingGroup.add(sprite);
+      codingSprites.push({
+        mesh: sprite,
+        speedY: 0.12 + Math.random() * 0.18,
+        initialX: x,
+        initialZ: z,
+        phase: Math.random() * 100
+      });
+    });
+
+    // ----------------------------------------------------
     // 4. FLOATING DATA PARTICLES (BIM Streams)
     // ----------------------------------------------------
     const particleCount = 180;
@@ -234,52 +375,6 @@ const Dev3DBackground = () => {
     // ----------------------------------------------------
     // 5. ORBITING STAT BADGES (Interactive 3D Infographics)
     // ----------------------------------------------------
-    const createTextSprite = (text, glowColor) => {
-      const sCanvas = document.createElement('canvas');
-      sCanvas.width = 256;
-      sCanvas.height = 64;
-      const sCtx = sCanvas.getContext('2d');
-
-      // Safe rounded rectangle helper for canvas text sprites
-      const drawRoundRect = (ctx, x, y, width, height, radius) => {
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + width - radius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-        ctx.lineTo(x + width, y + height - radius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        ctx.lineTo(x + radius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-      };
-
-      // Glassmorphic background
-      sCtx.fillStyle = 'rgba(11, 20, 36, 0.85)';
-      drawRoundRect(sCtx, 4, 4, 248, 56, 12);
-      sCtx.fill();
-
-      // Glowing border
-      sCtx.strokeStyle = glowColor;
-      sCtx.lineWidth = 2.5;
-      sCtx.stroke();
-
-      // Bold text formatting
-      sCtx.fillStyle = '#ffffff';
-      sCtx.font = 'bold 19px Courier, monospace';
-      sCtx.textAlign = 'center';
-      sCtx.textBaseline = 'middle';
-      sCtx.shadowColor = glowColor;
-      sCtx.shadowBlur = 8;
-      sCtx.fillText(text, 128, 32);
-
-      const tex = new THREE.CanvasTexture(sCanvas);
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-      const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(38, 9.5, 1);
-      return sprite;
-    };
 
     const orbitGroup = new THREE.Group();
     cityGroup.add(orbitGroup);
@@ -565,6 +660,36 @@ const Dev3DBackground = () => {
       // Rotate Apex blocks
       block2.rotation.y += 0.004;
       block2Wire.rotation.y += 0.004;
+
+      // Animate Robot Hovering
+      const hoverOsc = Math.sin(Date.now() * 0.0018) * 1.5;
+      robotGroup.position.y = 10 + hoverOsc;
+      
+      // Face camera slightly
+      robotGroup.rotation.y = Math.sin(Date.now() * 0.0005) * 0.1;
+
+      // Pulse engine flames (scale)
+      const flamePulse = 0.85 + Math.sin(Date.now() * 0.015) * 0.15;
+      flameLeft.scale.set(1, flamePulse, 1);
+      flameRight.scale.set(1, flamePulse, 1);
+
+      // Animate coding sprites rising and swaying (signifies development)
+      codingSprites.forEach(item => {
+        item.mesh.position.y += item.speedY;
+        
+        // Sway left and right
+        item.mesh.position.x = item.initialX + Math.sin(Date.now() * 0.0012 + item.phase) * 6;
+        
+        // Reset if it rises above the scene
+        if (item.mesh.position.y > 90) {
+          item.mesh.position.y = -35;
+          item.mesh.position.x = item.initialX;
+        }
+
+        // Apply dynamic opacity curve (fading in at bottom, out at top)
+        const progress = (item.mesh.position.y + 35) / 125; // 0 to 1
+        item.mesh.material.opacity = Math.sin(progress * Math.PI) * 0.75;
+      });
 
       // Float background data particles
       const posArr = particleGeo.attributes.position.array;

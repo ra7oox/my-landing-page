@@ -21,6 +21,12 @@ const CustomCursor = () => {
       mouseX = e.clientX;
       mouseY = e.clientY;
       if (dotRef.current) {
+        // Ensure cursor becomes visible immediately on first move
+        if (dotRef.current.style.opacity !== '1') {
+          dotRef.current.style.opacity = '1';
+          if (ringRef.current) ringRef.current.style.opacity = '1';
+          trailsRef.current.forEach(t => { if (t) t.style.opacity = '1'; });
+        }
         dotRef.current.style.left = `${mouseX}px`;
         dotRef.current.style.top = `${mouseY}px`;
       }
