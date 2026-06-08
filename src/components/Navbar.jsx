@@ -10,6 +10,44 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState('dark');
+  const [activeSection, setActiveSection] = useState('');
+
+  // Intersection Observer for highlighting active section
+  useEffect(() => {
+    const sections = ['about', 'services', 'projects', 'contact'];
+    const handleIntersection = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '-35% 0px -35% 0px',
+      threshold: 0.15
+    });
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        observer.observe(el);
+      }
+    });
+
+    const handleScroll = () => {
+      if (window.scrollY < 120) {
+        setActiveSection('');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Initialize theme and audio on mount
   useEffect(() => {
@@ -87,16 +125,17 @@ const Navbar = () => {
   ];
 
   return (
-    <motion.nav 
-      initial={{ opacity: 0, y: -30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-0 left-0 right-0 h-16 z-100 flex justify-between items-center px-[5%] transition-all duration-500 ${
-        scrolled && !mobileOpen
-          ? 'bg-navy-900/95 backdrop-blur-xl border-b border-cyan-glow/15 shadow-sm dark:shadow-[0_0_30px_rgba(0,242,255,0.05)]' 
-          : 'bg-transparent border-b border-transparent'
-      }`}
-    >
+    <>
+      <motion.nav 
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 h-16 z-100 flex justify-between items-center px-[5%] transition-all duration-500 ${
+          scrolled && !mobileOpen
+            ? 'bg-navy-900/95 backdrop-blur-xl border-b border-cyan-glow/15 shadow-sm dark:shadow-[0_0_30px_rgba(0,242,255,0.05)]' 
+            : '!bg-transparent !border-b-transparent !backdrop-blur-none !shadow-none'
+        }`}
+      >
       <a 
         href="#" 
         className={`flex items-center gap-3 font-display font-extrabold text-xl tracking-widest text-slate-900 dark:text-white uppercase select-none cursor-none group transition-opacity duration-300 ${
@@ -184,7 +223,7 @@ const Navbar = () => {
 
         <button 
           onClick={() => setMobileOpen(!mobileOpen)}
-          className={`hamburger ${mobileOpen ? 'active' : ''}`}
+          className={`hamburger transition-all duration-300 ${mobileOpen ? 'active opacity-0 pointer-events-none' : 'opacity-100'}`}
           aria-label="Toggle menu"
         >
           <span></span>
@@ -192,8 +231,9 @@ const Navbar = () => {
           <span></span>
         </button>
       </div>
+    </motion.nav>
 
-      <AnimatePresence>
+    <AnimatePresence>
         {mobileOpen && (
           <>
             {/* Backdrop Overlay with blur */}
@@ -203,73 +243,109 @@ const Navbar = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={closeMobile}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[98] md:hidden cursor-pointer"
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[98] md:hidden cursor-pointer"
             />
 
-            {/* Sidebar menu panel */}
-            <motion.div
+            {/* Sidebar menu panel - semantic aside */}
+            <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] border-l border-cyan-glow/15 dark:border-white/10 z-[99] flex flex-col justify-between p-8 pt-32 shadow-2xl md:hidden ${
-                lang === 'ar' ? 'text-right items-end' : 'text-left items-start'
-              }`}
+              transition={{ type: "spring", damping: 26, stiffness: 220 }}
+              className={`fixed top-0 right-0 bottom-0 w-[85vw] sm:w-[80vw] max-w-[360px] border-l border-cyan-glow/15 dark:border-white/10 z-[99] flex flex-col md:hidden shadow-2xl`}
               style={{
                 backgroundColor: 'var(--bg-mobile-menu)',
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)'
               }}
             >
-              <div className={`flex flex-col gap-6 w-full ${lang === 'ar' ? 'items-end' : 'items-start'}`}>
-                {navItems.map((item, i) => (
-                  <motion.a
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMobile}
-                    initial={{ x: lang === 'ar' ? -30 : 30, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: lang === 'ar' ? -30 : 30, opacity: 0 }}
-                    transition={{ delay: i * 0.06, type: "spring", stiffness: 150, damping: 20 }}
-                    className="text-slate-600 dark:text-gray-400 hover:text-cyan-glow transition-colors duration-300 text-xl font-display font-semibold tracking-[0.1em] uppercase cursor-none w-full py-2 border-b border-navy-700/10 dark:border-white/5"
-                  >
-                    {item.label}
-                  </motion.a>
-                ))}
-              </div>
+              {/* Integrated close button inside the sidebar container - fixed at the top */}
+              <button
+                onClick={closeMobile}
+                className={`absolute top-6 ${
+                  lang === 'ar' ? 'left-6' : 'right-6'
+                } w-10 h-10 rounded-full border border-cyan-glow/10 dark:border-white/10 bg-navy-850/80 dark:bg-white/5 hover:bg-cyan-glow/10 hover:border-cyan-glow/40 active:scale-95 active:bg-cyan-glow/20 text-cyan-glow dark:text-gray-400 flex items-center justify-center transition-all duration-300 z-10 cursor-none`}
+                aria-label="Close menu"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
 
-              <div className="flex flex-col gap-4 w-full mt-auto">
-                <Button
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  transition={{ delay: navItems.length * 0.06 }}
-                  onClick={() => { setLang(lang === 'en' ? 'ar' : 'en'); closeMobile(); }}
-                  variant="secondary"
-                  className="w-full text-xs font-mono font-bold"
-                >
-                  {lang === 'en' ? 'العربية' : 'English'}
-                </Button>
-                
-                <Button
-                  as="a"
-                  href="#contact"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  transition={{ delay: (navItems.length + 1) * 0.06 }}
-                  onClick={closeMobile}
-                  variant="primary"
-                  className="w-full text-xs font-mono font-bold"
-                >
-                  {t('navBtn')}
-                </Button>
+              {/* Scrollable content container */}
+              <div className={`h-full flex flex-col justify-between overflow-y-auto no-scrollbar px-6 pt-28 pb-12 ${
+                lang === 'ar' ? 'text-right items-end' : 'text-left items-start'
+              }`}>
+                {/* Semantic Navigation Links */}
+                <nav className="w-full mt-4">
+                  <ul className="flex flex-col gap-3.5 w-full">
+                    {navItems.map((item, i) => {
+                      const isActive = (item.href === '#' && activeSection === '') || (item.href.slice(1) === activeSection);
+                      return (
+                        <li key={item.href} className="w-full">
+                          <motion.a
+                            href={item.href}
+                            onClick={closeMobile}
+                            initial={{ x: lang === 'ar' ? -20 : 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: lang === 'ar' ? -20 : 20, opacity: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 150, damping: 20 }}
+                            className={`group relative flex items-center w-full py-3.5 ${
+                              lang === 'ar' ? 'pr-6 pl-3 justify-end text-right' : 'pl-6 pr-3 justify-start text-left'
+                            } rounded-xl font-sans font-medium text-base tracking-[0.03em] cursor-none transition-all duration-300 ${
+                              isActive
+                                ? 'text-cyan-glow bg-cyan-glow/[0.06] dark:bg-cyan-glow/[0.04] font-semibold'
+                                : 'text-slate-500 dark:text-gray-400 hover:text-cyan-glow hover:bg-cyan-glow/[0.02]'
+                            }`}
+                          >
+                            {/* Left glowing neon border indicator */}
+                            <span 
+                              className={`absolute ${
+                                lang === 'ar' ? 'right-0 rounded-l' : 'left-0 rounded-r'
+                              } top-1/2 -translate-y-1/2 w-1 h-5 bg-cyan-glow shadow-[0_0_12px_#00f2ff] transition-all duration-300 ${
+                                isActive ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-50 group-hover:opacity-100 group-hover:scale-y-100'
+                              }`} 
+                            />
+                            <span>{item.label}</span>
+                          </motion.a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </nav>
+
+                {/* Bottom Action Buttons (Language & CTA) */}
+                <div className="flex flex-col gap-3.5 w-full mt-10">
+                  <button
+                    onClick={() => { setLang(lang === 'en' ? 'ar' : 'en'); closeMobile(); }}
+                    className="w-full h-12 rounded-xl border border-cyan-glow/20 dark:border-white/10 bg-navy-800/40 dark:bg-white/[0.02] text-xs font-sans font-bold uppercase tracking-widest text-cyan-glow dark:text-white/80 hover:bg-cyan-glow/10 hover:border-cyan-glow/40 active:scale-98 transition-all duration-300 cursor-none flex items-center justify-center gap-2"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>{lang === 'en' ? 'العربية' : 'English'}</span>
+                  </button>
+                  
+                  <a
+                    href="#contact"
+                    onClick={closeMobile}
+                    className="w-full h-12 rounded-xl bg-gradient-to-r from-cyan-glow to-violet-500 text-xs font-sans font-bold uppercase tracking-widest text-navy-900 hover:shadow-[0_0_25px_rgba(0,242,255,0.35)] active:scale-[0.98] transition-all duration-300 cursor-none flex items-center justify-center gap-2"
+                  >
+                    <span>{t('navBtn')}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="translate-y-[0.5px]">
+                      {lang === 'ar' ? <path d="M19 12H5M12 19l-7-7 7-7"/> : <path d="M5 12h14M12 5l7 7-7 7"/>}
+                    </svg>
+                  </a>
+                </div>
               </div>
-            </motion.div>
+            </motion.aside>
           </>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   );
 };
 

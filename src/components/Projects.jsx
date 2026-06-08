@@ -251,7 +251,7 @@ const Projects = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
-          <div className="lg:col-span-5 flex flex-col gap-5 justify-center">
+          <div className="lg:col-span-5 flex flex-row overflow-x-auto pb-4 lg:pb-0 lg:flex-col gap-4 lg:gap-5 justify-start lg:justify-center snap-x no-scrollbar">
             {Object.keys(projectsData).map((key, index) => {
               const proj = projectsData[key];
               const isActive = activeProject === key;
@@ -261,10 +261,10 @@ const Projects = () => {
                 <motion.button
                   key={key}
                   onClick={() => handleProjectSelect(key)}
-                  whileHover={{ scale: 1.02, x: lang === 'ar' ? -4 : 4 }}
+                  whileHover={window.innerWidth > 768 ? { scale: 1.02, x: lang === 'ar' ? -4 : 4 } : { scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  style={{ padding: '20px' }}
-                  className={`relative w-full text-left ${lang === 'ar' ? 'text-right' : 'text-left'} rounded-xl border backdrop-blur-xl transition-all duration-400 cursor-none overflow-hidden ${
+                  style={{ padding: '16px 20px' }}
+                  className={`relative flex-shrink-0 w-[260px] lg:w-full text-left ${lang === 'ar' ? 'text-right' : 'text-left'} rounded-xl border backdrop-blur-xl transition-all duration-400 cursor-none overflow-hidden snap-center ${
                     isActive 
                       ? 'bg-gradient-to-r from-cyan-glow/[0.06] to-transparent border-cyan-glow/30 shadow-[0_0_30px_rgba(0,242,255,0.06)]' 
                       : 'bg-navy-800/30 border-navy-700/30 dark:border-white/5 hover:border-cyan-glow/15 hover:bg-navy-800/50'
@@ -287,12 +287,12 @@ const Projects = () => {
                       </span>
                     </div>
                     
-                    <div className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all duration-300 ${
+                    <div className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
                       isActive 
                         ? 'border-cyan-glow/30 bg-cyan-glow/10 text-cyan-glow' 
                         : 'border-navy-700/30 dark:border-white/10 text-slate-500 dark:text-gray-500 bg-navy-800/20 dark:bg-white/[0.01]'
                     }`}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         {lang === 'ar' ? <path d="m15 18-6-6 6-6" /> : <path d="m9 18 6-6-6-6" />}
                       </svg>
                     </div>

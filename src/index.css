@@ -45,7 +45,7 @@
   --border:   rgba(0,212,255,0.2);
   --bg-nav:   rgba(6, 13, 24, 0.92);
   --border-nav: rgba(0, 212, 255, 0.1);
-  --bg-mobile-menu: rgba(6, 13, 24, 0.98);
+  --bg-mobile-menu: rgba(6, 13, 24, 0.82);
 }
 
 html {
@@ -76,6 +76,14 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 242, 255, 0.5);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 ::selection {
@@ -907,7 +915,7 @@ nav {
   --border:   rgba(2, 132, 199, 0.2);
   --bg-nav:   rgba(248, 250, 252, 0.92);
   --border-nav: rgba(2, 132, 199, 0.15);
-  --bg-mobile-menu: rgba(248, 250, 252, 0.98);
+  --bg-mobile-menu: rgba(248, 250, 252, 0.82);
 }
 
 /* Light mode bento background city gradient */
