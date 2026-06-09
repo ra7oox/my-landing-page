@@ -5,6 +5,9 @@ import Hero from './components/Hero';
 import About from './components/About';
 import Services from './components/Services';
 import Projects from './components/Projects';
+import TechStack from './components/TechStack';
+import Testimonials from './components/Testimonials';
+import Timeline from './components/Timeline';
 import Contact from './components/Contact';
 import Dev3DBackground from './components/Dev3DBackground';
 import CustomCursor from './components/CustomCursor';
@@ -42,6 +45,9 @@ function App() {
       <About />
       <Services />
       <Projects />
+      <TechStack />
+      <Testimonials />
+      <Timeline />
       <Contact />
     </LanguageProvider>
   );

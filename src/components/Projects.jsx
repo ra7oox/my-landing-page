@@ -236,6 +236,9 @@ const Projects = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16"
         >
+          <span className="story-step mb-3 justify-center">
+            04 / 06
+          </span>
           <span className="text-cyan-glow text-[10px] uppercase tracking-[0.3em] font-mono font-bold block mb-3">
             {t('projectsTitle')}
           </span>

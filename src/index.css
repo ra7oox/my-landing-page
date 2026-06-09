@@ -48,6 +48,69 @@
   --bg-mobile-menu: rgba(6, 13, 24, 0.82);
 }
 
+/* ==========================================================================
+   UI/UX PRO MAX - ACCESSIBILITY, MOTION & STORYTELLING ENHANCEMENTS
+   ========================================================================== */
+
+/* Reduced Motion (UX #9): respect user accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .stagger-up, .reveal { opacity: 1 !important; transform: none !important; }
+  .hero-title span { clip-path: inset(0) !important; }
+}
+
+/* Focus Visible (UX #28): keyboard navigation ring */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Micro-interaction: press feedback for touch/mouse (UX #30) */
+.press-effect {
+  transition: transform 0.15s ease;
+}
+@media (hover: hover) {
+  .press-effect:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Parallax scroll base */
+.parallax {
+  will-change: transform;
+}
+
+/* Storytelling section step indicator */
+.story-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-family: 'Space Grotesk', monospace;
+  letter-spacing: 0.35em;
+  color: rgba(0, 212, 255, 0.35);
+  pointer-events: none;
+  user-select: none;
+}
+.story-step::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: rgba(0, 212, 255, 0.2);
+}
+.story-step::after {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: rgba(0, 212, 255, 0.2);
+}
+
 html {
   scroll-behavior: smooth;
 }

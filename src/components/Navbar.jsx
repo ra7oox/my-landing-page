@@ -14,7 +14,7 @@ const Navbar = () => {
 
   // Intersection Observer for highlighting active section
   useEffect(() => {
-    const sections = ['about', 'services', 'projects', 'contact'];
+    const sections = ['about', 'services', 'projects', 'tech', 'testimonials', 'timeline', 'contact'];
     const handleIntersection = (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -121,6 +121,8 @@ const Navbar = () => {
     { href: '#about', label: t('navAbout') },
     { href: '#services', label: t('navServices') },
     { href: '#projects', label: t('navProjects') },
+    { href: '#tech', label: t('navTech') },
+    { href: '#testimonials', label: t('navTestimonials') },
     { href: '#contact', label: t('navContact') },
   ];
 

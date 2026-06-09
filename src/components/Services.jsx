@@ -114,6 +114,9 @@ const Services = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className={`mb-16 max-w-4xl ${lang === 'ar' ? 'text-right' : 'text-left'}`}
         >
+          <span className="story-step mb-3">
+            03 / 05
+          </span>
           <span className="text-cyan-glow text-[10px] uppercase tracking-[0.3em] font-mono font-bold block mb-3">
             {t('servicesTitle')}
           </span>

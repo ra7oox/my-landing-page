@@ -10,6 +10,7 @@ const Hero = () => {
   const [loading, setLoading] = useState(true);
   const [loadPercent, setLoadPercent] = useState(0);
   const loaderCanvasRef = useRef(null);
+  const gradientRef = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,6 +26,17 @@ const Hero = () => {
     }, 120);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Parallax scroll effect on hero gradient overlay
+  useEffect(() => {
+    const el = gradientRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      el.style.transform = `translateY(${window.scrollY * 0.15}px)`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Trigger robot welcome speech on load completion
@@ -273,7 +285,10 @@ const Hero = () => {
         className="relative min-h-screen py-24 md:py-32 lg:py-40 flex items-center justify-center overflow-hidden bg-transparent" 
         id="hero"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-navy-900/90 z-10 pointer-events-none" />
+        <div 
+          ref={gradientRef}
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-navy-900/90 z-10 pointer-events-none parallax" 
+        />
 
         <motion.div 
           variants={containerVariants}
@@ -281,6 +296,9 @@ const Hero = () => {
           animate={loading ? "hidden" : "visible"}
           className="relative z-20 text-center px-6 flex flex-col items-center max-w-4xl"
         >
+          <div className="story-step mb-6">
+            01 / 05
+          </div>
           <motion.div
             variants={itemVariants}
             className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-glow/20 bg-cyan-glow/5 text-cyan-glow text-[10px] font-mono tracking-[0.2em] uppercase !py-1.5 !px-4"

@@ -112,6 +112,9 @@ const Contact = () => {
           transition={{ duration: 0.6 }}
           className="mb-16 text-center lg:text-left lg:max-w-xl"
         >
+          <span className="story-step mb-4">
+            07 / 06
+          </span>
           <span className="text-[#00f2ff] text-[11px] uppercase tracking-[0.3em] font-mono font-bold block mb-3">
             {t('contactTitle')}
           </span>

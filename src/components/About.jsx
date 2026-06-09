@@ -86,6 +86,9 @@ const About = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="relative"
           >
+            <span className="story-step mb-4">
+              02 / 05
+            </span>
             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-glow/20 via-transparent to-amber-glow/20 rounded-2xl blur-xl opacity-50" />
             <div 
               className="relative bg-navy-800/80 backdrop-blur-md border border-cyan-glow/20 rounded-2xl shadow-[0_0_60px_rgba(0,242,255,0.08),inset_0_0_30px_rgba(0,242,255,0.02)] max-w-xl !p-6 sm:!p-10"
@@ -137,7 +140,7 @@ const About = () => {
                 }}
                 onMouseEnter={() => handleStatHover(true)}
                 onMouseLeave={() => handleStatHover(false)}
-                className={`group bg-navy-800/70 backdrop-blur-md border ${stat.borderColor} rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-300 cursor-none hover:shadow-[0_0_40px_rgba(0,242,255,0.08)] !p-4 sm:!p-6`}
+                className={`press-effect group bg-navy-800/70 backdrop-blur-md border ${stat.borderColor} rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-300 cursor-none hover:shadow-[0_0_40px_rgba(0,242,255,0.08)] !p-4 sm:!p-6`}
               >
                 <div className="flex flex-col">
                   <div className={`${stat.color} text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-[0_0_15px_${stat.glowColor}] font-display`}>
